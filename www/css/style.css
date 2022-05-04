@@ -1,0 +1,6 @@
+/*For the page which don't have a vertical scroll bar*/
+footer {
+    position: absolute;
+    width: 100%;
+    bottom:0;
+}

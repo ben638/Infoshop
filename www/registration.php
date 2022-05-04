@@ -1,3 +1,40 @@
+<?php
+    $dir = "./";
+    session_start();
+    if (isset($_SESSION["email"]))
+    {
+        header("Location: " . $dir . "profil.php");
+        exit(0);
+    }
+    if (isset($_POST["email"]) && isset($_POST["password"]) && isset($_POST["passwordConfirm"]) && isset($_POST["streetName"]) && isset($_POST["streetNumber"]) && isset($_POST["postalCode"]) && isset($_POST["city"]))
+    {
+        require $dir . "lib/functions.inc.php";
+        $email = htmlspecialchars($_POST["email"]);
+        $passwordHash = hash('sha256', htmlspecialchars($_POST['password']));
+        $passwordConfirmHash = hash('sha256', htmlspecialchars($_POST['passwordConfirm']));
+        $streetName = htmlspecialchars($_POST["streetName"]);
+        $streetNumber = htmlspecialchars($_POST["streetNumber"]);
+        $postalCode = htmlspecialchars($_POST["postalCode"]);
+        $city = htmlspecialchars($_POST["city"]);
+        $success = false;
+        if ($passwordHash == $passwordConfirmHash)
+        {
+            $success = createUser($email, $passwordHash, $streetName, $streetNumber, $postalCode, $city);
+        }
+        else
+        {
+            $passwordMessageError = "Les mots de passe ne correspondent pas";
+        }
+        if ($success)
+        {
+            header("Location: " . $dir . "login.php");
+            exit(0);
+        }
+        else {
+            $emailErrorMessage = "L'email est déjà utilisé";
+        }
+    }
+?>
 <!DOCTYPE html>
 <html>
 
@@ -13,19 +50,9 @@
 </head>
 
 <body>
-    <nav class="navbar navbar-light navbar-expand-lg fixed-top bg-white clean-navbar">
-        <div class="container"><a class="navbar-brand logo" href="#">Shopinfo</a><button data-bs-toggle="collapse" class="navbar-toggler" data-bs-target="#navcol-1"><span class="visually-hidden">Toggle navigation</span><span class="navbar-toggler-icon"></span></button>
-            <div class="collapse navbar-collapse" id="navcol-1">
-                <ul class="navbar-nav ms-auto">
-                    <li class="nav-item"><a class="nav-link" href="catalog-page.html">Acceuil</a></li>
-                    <li class="nav-item"><a class="nav-link" href="shopping-cart.html">panier</a></li>
-                    <li class="nav-item"><a class="nav-link" href="login.html">Connexion</a></li>
-                    <li class="nav-item"><a class="nav-link active" href="registration.html">Inscription</a></li>
-                    <li class="nav-item"><a class="nav-link" href="registration-1.html">Profil</a></li>
-                </ul>
-            </div>
-        </div>
-    </nav>
+    <?php 
+        require "headers/navBar.php";
+    ?>
     <main class="page registration-page">
         <section class="clean-block clean-form dark">
             <div class="container">
@@ -33,63 +60,27 @@
                     <h2 class="text-info">Inscription</h2>
                     <p>Nouveau visiteur ? Inscrivez-vous !</p>
                 </div>
-                <form>
-                    <div class="mb-3"><label class="form-label" for="name">Email</label><input class="form-control item" type="text" id="email"></div>
-                    <div class="mb-3"><label class="form-label" for="password">Mot de passe</label><input class="form-control item" type="password" id="password"></div>
-                    <div class="mb-3"><label class="form-label" for="email">Ré-entrer votre mot de passe</label><input class="form-control item" type="password" id="passwordConfirm"></div>
+                <form method="post" action="registration.php">
+                    <div class="mb-3"><label class="form-label" for="email">Email</label><input class="form-control item" type="email" id="email" name="email" required></div>
+                    <div class="mb-3"><p><?php echo $emailErrorMessage ?></p></div>
+                    <div class="mb-3"><label class="form-label" for="password">Mot de passe</label><input class="form-control item" type="password" id="password" name="password" required></div>
+                    <div class="mb-3"><label class="form-label" for="passwordConfirm">Ré-entrer votre mot de passe</label><input class="form-control item" type="password" id="passwordConfirm" name="passwordConfirm" required></div>
+                    <div class="mb-3"><p><?php echo $passwordMessageError ?></p></div>
                     <fieldset>
                         <legend>Adresse</legend>
-                        <div class="mb-3"><label class="form-label" for="email">Rue</label><input class="form-control item" type="text" id="streetName">
-                            <div class="mb-3"><label class="form-label" for="email">N°</label><input class="form-control item" type="text" id="streetNumber"></div>
+                        <div class="mb-3"><label class="form-label" for="email">Rue</label><input class="form-control item" type="text" id="streetName" name="streetName" required>
+                            <div class="mb-3"><label class="form-label" for="email">N°</label><input class="form-control item" type="text" id="streetNumber" name="streetNumber" required></div>
                         </div>
-                        <div class="mb-3"><label class="form-label" for="email">Code postal</label><input class="form-control item" type="text" id="postalCode"></div>
-                        <div class="mb-3"><label class="form-label" for="email">Ville</label><input class="form-control item" type="text" id="city"></div>
+                        <div class="mb-3"><label class="form-label" for="email">Code postal</label><input class="form-control item" type="text" id="postalCode" name="postalCode" required></div>
+                        <div class="mb-3"><label class="form-label" for="email">Ville</label><input class="form-control item" type="text" id="city" name="city" required></div>
                     </fieldset><button class="btn btn-primary" type="submit">S'inscrire</button>
                 </form>
             </div>
         </section>
     </main>
-    <footer class="page-footer dark">
-        <div class="container">
-            <div class="row">
-                <div class="col-sm-3">
-                    <h5>Get started</h5>
-                    <ul>
-                        <li><a href="#">Home</a></li>
-                        <li><a href="#">Sign up</a></li>
-                        <li><a href="#">Downloads</a></li>
-                    </ul>
-                </div>
-                <div class="col-sm-3">
-                    <h5>About us</h5>
-                    <ul>
-                        <li><a href="#">Company Information</a></li>
-                        <li><a href="#">Contact us</a></li>
-                        <li><a href="#">Reviews</a></li>
-                    </ul>
-                </div>
-                <div class="col-sm-3">
-                    <h5>Support</h5>
-                    <ul>
-                        <li><a href="#">FAQ</a></li>
-                        <li><a href="#">Help desk</a></li>
-                        <li><a href="#">Forums</a></li>
-                    </ul>
-                </div>
-                <div class="col-sm-3">
-                    <h5>Legal</h5>
-                    <ul>
-                        <li><a href="#">Terms of Service</a></li>
-                        <li><a href="#">Terms of Use</a></li>
-                        <li><a href="#">Privacy Policy</a></li>
-                    </ul>
-                </div>
-            </div>
-        </div>
-        <div class="footer-copyright">
-            <p>© 2022 Copyright Text</p>
-        </div>
-    </footer>
+    <?php 
+        require "headers/footer.php";
+    ?>
     <script src="assets/bootstrap/js/bootstrap.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/baguettebox.js/1.11.1/baguetteBox.min.js"></script>
     <script src="assets/js/vanilla-zoom.js"></script>
