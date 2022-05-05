@@ -1,3 +1,13 @@
+<?php
+    /**
+     * Anthonioz Benjamin
+     * IFA-P3B
+     * CFPT Informatique
+     * TPI 2022
+     * Footer du site Infoshop
+     * 
+     */
+?>
 <footer class="page-footer dark">
     <div class="container">
         <div class="row">

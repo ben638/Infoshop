@@ -1,4 +1,12 @@
 <?php
+    /**
+     * Anthonioz Benjamin
+     * IFA-P3B
+     * CFPT Informatique
+     * TPI 2022
+     * Page de paiement du site Infoshop
+     * 
+     */
     $dir = "./";
     session_start();
     if (isset($_SESSION["email"]))
@@ -13,7 +21,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no">
-    <title>Payment - Shopinfo</title>
+    <title>Paiement - Shopinfo</title>
     <link rel="stylesheet" href="assets/bootstrap/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Montserrat:400,400i,700,700i,600,600i&amp;display=swap">
     <link rel="stylesheet" href="assets/fonts/simple-line-icons.min.css">

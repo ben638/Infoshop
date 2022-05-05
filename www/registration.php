@@ -1,4 +1,12 @@
 <?php
+    /**
+     * Anthonioz Benjamin
+     * IFA-P3B
+     * CFPT Informatique
+     * TPI 2022
+     * Page d'inscription du site Infoshop
+     * 
+     */
     $dir = "./";
     session_start();
     if (isset($_SESSION["email"]))
@@ -10,14 +18,14 @@
     {
         require $dir . "lib/functions.inc.php";
         $email = htmlspecialchars($_POST["email"]);
-        $passwordHash = hash('sha256', htmlspecialchars($_POST['password']));
-        $passwordConfirmHash = hash('sha256', htmlspecialchars($_POST['passwordConfirm']));
+        $passwordHash = password_hash(htmlspecialchars($_POST['password']), PASSWORD_DEFAULT);
+        $passwordConfirm = htmlspecialchars($_POST['passwordConfirm']);
         $streetName = htmlspecialchars($_POST["streetName"]);
         $streetNumber = htmlspecialchars($_POST["streetNumber"]);
         $postalCode = htmlspecialchars($_POST["postalCode"]);
         $city = htmlspecialchars($_POST["city"]);
         $success = false;
-        if ($passwordHash == $passwordConfirmHash)
+        if (password_verify($passwordConfirm, $passwordHash))
         {
             $success = createUser($email, $passwordHash, $streetName, $streetNumber, $postalCode, $city);
         }
@@ -41,7 +49,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no">
-    <title>Register - Shopinfo</title>
+    <title>Inscription - Shopinfo</title>
     <link rel="stylesheet" href="assets/bootstrap/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Montserrat:400,400i,700,700i,600,600i&amp;display=swap">
     <link rel="stylesheet" href="assets/fonts/simple-line-icons.min.css">
