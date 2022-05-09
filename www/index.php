@@ -25,7 +25,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no">
-    <title>Accueil - Shopinfo</title>
+    <title>Blog - Shopinfo</title>
     <link rel="stylesheet" href="assets/bootstrap/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Montserrat:400,400i,700,700i,600,600i&amp;display=swap">
     <link rel="stylesheet" href="assets/fonts/simple-line-icons.min.css">
@@ -37,152 +37,35 @@
     <?php 
         require "headers/navBar.php";
     ?>
-    <main class="page catalog-page">
-        <section class="clean-block clean-catalog dark">
+    <main class="page blog-post-list">
+        <section class="clean-block clean-blog-list dark">
             <div class="container">
                 <div class="block-heading">
                     <h2 class="text-info">Nos produits en vente</h2>
-                </div>
-                <form action="index.php" method="post">
-                    <input type="search" style="margin-bottom: 30px;height: 32px;width: 310px;" placeholder="Rechercher par nom ou description" name="termToSearch">
-                    <button class="btn btn-primary" type="submit" style="margin-left: 15px;margin-top: -1px;width: 50px;height: 32px;padding-top: 0px;padding-bottom: 0px;">
-                        <img src="assets/img/icons8-chercher.svg">
-                    </button>
-                </form>
-                <div class="content">
-                    <div class="row">
-                        <div class="col-md-9" style="width: 1312px;">
-                            <div class="products">
-                                <div class="row g-0">
-                                    <?php 
-                                        foreach ($products as $product) 
-                                        {
-                                            echo "<div class=\"col-12 col-md-6 col-lg-4\">
-                                                        <div class=\"clean-product-item\">
-                                                            <div class=\"image\"><a href=\"#\"><img class=\"img-fluid d-block mx-auto\" src=\"" . PICTURES_FOLDER . $product["fileName"] . "\"></a></div>
-                                                            <div class=\"product-name\"><a href=\"" . $dir . "productDetails.php?productId\">" . $product["productName"] . "</a></div>
-                                                            <div class=\"about\">
-                                                                <p style=\"width: 320px;margin-top: 0px;\">" . $product["description"] . "</p>
-                                                                <div class=\"price\">
-                                                                    <h3 style=\"margin-top: 0px;\">" . $product["priceInCHF"] . " CHF</h3>
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                    </div>";
-                                        }
-                                    ?>
-                                    <div class="col-12 col-md-6 col-lg-4">
-                                        <div class="clean-product-item">
-                                            <div class="image"><a href="#"><img class="img-fluid d-block mx-auto" src="assets/img/tech/image2.jpg"></a></div>
-                                            <div class="product-name"><a href="#">Titre</a></div>
-                                            <div class="about">
-                                                <p style="width: 320px;margin-top: 0px;">Description</p>
-                                                <div class="price">
-                                                    <h3 style="margin-top: 0px;">$100</h3>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="col-12 col-md-6 col-lg-4">
-                                        <div class="clean-product-item">
-                                            <div class="image"><a href="#"><img class="img-fluid d-block mx-auto" src="assets/img/tech/image2.jpg"></a></div>
-                                            <div class="product-name"><a href="#">Titre</a></div>
-                                            <div class="about">
-                                                <p style="width: 320px;margin-top: 0px;">Description</p>
-                                                <div class="price">
-                                                    <h3 style="margin-top: 0px;">$100</h3>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="col-12 col-md-6 col-lg-4">
-                                        <div class="clean-product-item">
-                                            <div class="image"><a href="#"><img class="img-fluid d-block mx-auto" src="assets/img/tech/image2.jpg"></a></div>
-                                            <div class="product-name"><a href="#">Titre</a></div>
-                                            <div class="about">
-                                                <p style="width: 320px;margin-top: 0px;">Description</p>
-                                                <div class="price">
-                                                    <h3 style="margin-top: 0px;">$100</h3>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="col-12 col-md-6 col-lg-4">
-                                        <div class="clean-product-item">
-                                            <div class="image"><a href="#"><img class="img-fluid d-block mx-auto" src="assets/img/tech/image2.jpg"></a></div>
-                                            <div class="product-name"><a href="#">Titre</a></div>
-                                            <div class="about">
-                                                <p style="width: 320px;margin-top: 0px;">Description</p>
-                                                <div class="price">
-                                                    <h3 style="margin-top: 0px;">$100</h3>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="col-12 col-md-6 col-lg-4">
-                                        <div class="clean-product-item">
-                                            <div class="image"><a href="#"><img class="img-fluid d-block mx-auto" src="assets/img/tech/image2.jpg"></a></div>
-                                            <div class="product-name"><a href="#">Titre</a></div>
-                                            <div class="about">
-                                                <p style="width: 320px;margin-top: 0px;">Description</p>
-                                                <div class="price">
-                                                    <h3 style="margin-top: 0px;">$100</h3>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="col-12 col-md-6 col-lg-4">
-                                        <div class="clean-product-item">
-                                            <div class="image"><a href="#"><img class="img-fluid d-block mx-auto" src="assets/img/tech/image2.jpg"></a></div>
-                                            <div class="product-name"><a href="#">Titre</a></div>
-                                            <div class="about">
-                                                <p style="width: 320px;margin-top: 0px;">Description</p>
-                                                <div class="price">
-                                                    <h3 style="margin-top: 0px;">$100</h3>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="col-12 col-md-6 col-lg-4">
-                                        <div class="clean-product-item">
-                                            <div class="image"><a href="#"><img class="img-fluid d-block mx-auto" src="assets/img/tech/image2.jpg"></a></div>
-                                            <div class="product-name"><a href="#">Titre</a></div>
-                                            <div class="about">
-                                                <p style="width: 320px;margin-top: 0px;">Description</p>
-                                                <div class="price">
-                                                    <h3 style="margin-top: 0px;">$100</h3>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="col-12 col-md-6 col-lg-4">
-                                        <div class="clean-product-item">
-                                            <div class="image"><a href="#"><img class="img-fluid d-block mx-auto" src="assets/img/tech/image2.jpg"></a></div>
-                                            <div class="product-name"><a href="#">Titre</a></div>
-                                            <div class="about">
-                                                <p style="width: 320px;margin-top: 0px;">Description</p>
-                                                <div class="price">
-                                                    <h3 style="margin-top: 0px;">$100</h3>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="col-12 col-md-6 col-lg-4">
-                                        <div class="clean-product-item">
-                                            <div class="image"><a href="#"><img class="img-fluid d-block mx-auto" src="assets/img/tech/image2.jpg"></a></div>
-                                            <div class="product-name"><a href="#">Titre</a></div>
-                                            <div class="about">
-                                                <p style="width: 320px;margin-top: 0px;">Description</p>
-                                                <div class="price">
-                                                    <h3 style="margin-top: 0px;">$100</h3>
-                                                </div>
-                                            </div>
-                                        </div>
+                </div><input type="search" style="margin-bottom: 30px;height: 32px;width: 310px;" placeholder="Rechercher par nom ou description"><button class="btn btn-primary" type="button" style="margin-left: 15px;margin-top: -1px;width: 50px;height: 32px;padding-top: 0px;padding-bottom: 0px;"><img src="assets/img/icons8-chercher.svg"></button>
+                <div class="block-content">
+                <?php 
+                    foreach ($products as $product) 
+                    {
+                        echo "<div class=\"clean-blog-post\">
+                                <div class=\"row\">
+                                    <div class=\"col-lg-5\"><a href=\"#\"><img class=\"img-fluid d-block mx-auto\" src=\"" . PICTURES_FOLDER . $product["fileName"] . "\"></a></div>
+                                    <div class=\"col-lg-7\">
+                                        <h3><a href=\"" . $dir . "productDetails.php?productId\">" . $product["productName"] . "</a></h3>
+                                        <p>" . $product["description"] . "</p>
+                                        <p>" . $product["priceInCHF"] . " CHF</p>
                                     </div>
                                 </div>
-                                <nav>
-                                    <ul class="pagination"></ul>
-                                </nav>
+                            </div>";
+                    }
+                ?>
+                    <div class="clean-blog-post">
+                        <div class="row">
+                            <div class="col-lg-5"><img class="rounded img-fluid" src="assets/img/tech/image4.jpg"></div>
+                            <div class="col-lg-7">
+                                <h3>Titre</h3>
+                                <p>Description</p>
+                                <p>Prix</p>
                             </div>
                         </div>
                     </div>
