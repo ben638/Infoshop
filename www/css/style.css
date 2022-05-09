@@ -4,3 +4,7 @@ footer {
     width: 100%;
     bottom:0;
 }
+
+#productPrice {
+    margin-left: -37px;
+}

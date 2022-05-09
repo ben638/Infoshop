@@ -4,7 +4,7 @@
      * IFA-P3B
      * CFPT Informatique
      * TPI 2022
-     * Footer du site Infoshop
+     * Infoshop footer which is used in all pages
      * 
      */
 ?>

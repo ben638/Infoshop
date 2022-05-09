@@ -1,6 +1,9 @@
 <?php
     require "./lib/constantes.inc.php";
-    //function which connect to the database
+    /**
+     * Function which return a pdo object
+     * @return PDO
+     */
     function dbConnect()
     {
         static $dbc = null;
@@ -21,7 +24,7 @@
     }
 
     /**
-     * function which create a user in the database
+     * Function which create a user in the database
      * @param $email
      * @param $passwordHash
      * @param $streetName
@@ -59,7 +62,7 @@
     }
 
     /**
-     * function which check if a user exists in the database
+     * Function which check if a user exists in the database
      * @param $email
      * @return bool
      */
@@ -86,7 +89,7 @@
     }
 
     /**
-     * function which if a user
+     * Function which if a user
      * @param $email
      * @return bool|array
      */
@@ -113,8 +116,11 @@
         return $answer[0];
     }
 
-    //function which returns the products of the database
-    function getProducts()
+    /**
+     * Function which return the products in the database
+     * @return bool|array
+     */
+    function getAllProducts()
     {
         static $ps = null;
         $sql = 'SELECT * FROM PRODUCT JOIN PICTURE_PRODUCT ON PRODUCT.idProduct = PICTURE_PRODUCT.idProduct JOIN PICTURE ON PICTURE.idPicture = PICTURE_PRODUCT.idPicture WHERE isDefaultPicture = 1;';
@@ -136,6 +142,94 @@
         return $answer;
     }
 
+    function getProducts()
+    {   
+        $answer = false;
+        static $ps = null;
+        $sql = 'SELECT * FROM PRODUCT JOIN PICTURE_PRODUCT ON PRODUCT.idProduct = PICTURE_PRODUCT.idProduct JOIN PICTURE ON PICTURE.idPicture = PICTURE_PRODUCT.idPicture WHERE isDefaultPicture = 1 AND PRODUCT.idProduct = :ID_PRODUCT;';
+
+        if ($ps == null)
+        {
+            $ps = dbConnect()->prepare($sql);
+        }
+        
+        try {
+            $ps->bindParam(':ID_PRODUCT', $idProduct, PDO::PARAM_INT);
+            if ($ps->execute())
+            {
+                $answer = $ps->fetchAll(PDO::FETCH_ASSOC);
+            }
+        } 
+        catch (PDOException $e) {
+            echo $e->getMessage();
+        }
+        return $answer;
+    }
+
+    /**
+     * Function which return the product whit the id given in parameter
+     * @param $idProduct
+     * @return bool|array
+     */
+    function getProduct($idProduct)
+    {
+        static $ps = null;
+        $sql = 'SELECT * FROM PRODUCT WHERE idProduct = :ID_PRODUCT;';
+
+        if ($ps == null)
+        {
+            $ps = dbConnect()->prepare($sql);
+        }
+        $answer = false;
+        try {
+            $ps->bindParam(':ID_PRODUCT', $idProduct, PDO::PARAM_INT);
+            if ($ps->execute())
+            {
+                $answer = $ps->fetchAll(PDO::FETCH_ASSOC);
+            }
+        } 
+        catch (PDOException $e) {
+            echo $e->getMessage();
+        }
+        return $answer[0];
+    }
+
+    /**
+     * Function which return the pictures of a product
+     * @param $idProduct
+     * @return bool|array
+     * @throws PDOException
+     * 
+     */
+    function getPictures($idProduct)
+    {
+        static $ps = null;
+        $sql = 'SELECT * FROM PICTURE JOIN PICTURE_PRODUCT ON PICTURE_PRODUCT.idPicture = PICTURE.idPicture WHERE idProduct = :ID_PRODUCT ORDER BY isDefaultPicture DESC;';
+
+        if ($ps == null)
+        {
+            $ps = dbConnect()->prepare($sql);
+        }
+        $answer = false;
+        try {
+            $ps->bindParam(':ID_PRODUCT', $idProduct, PDO::PARAM_INT);
+            if ($ps->execute())
+            {
+                $answer = $ps->fetchAll(PDO::FETCH_ASSOC);
+            }
+        } 
+        catch (PDOException $e) {
+            echo $e->getMessage();
+        }
+        return $answer;
+
+    } 
+
+    /**
+     * Function which return the products which have a name or a description which is like the term given in parameter
+     * @param $termToSearch
+     * @return bool|array
+     */
     function searchProducts($termToSearch)
     {
         static $ps = null;
@@ -152,6 +246,257 @@
             {
                 $answer = $ps->fetchAll(PDO::FETCH_ASSOC);
             }
+        } 
+        catch (PDOException $e) {
+            echo $e->getMessage();
+        }
+        return $answer;
+    }
+
+    /**
+     * Function which add a product in the $_SESSION['shoppingBasket']
+     */
+    function addProductToShoppingBasketSession($idProduct, $quantity)
+    {
+        session_start();
+        if (isset($_SESSION['shoppingBasket'][$idProduct]))
+        {
+            $_SESSION['shoppingBasket'][$idProduct] += $quantity;
+        }
+        else {
+            $_SESSION['shoppingBasket'][$idProduct] = $quantity;
+        }
+    }
+    
+    /**
+     * Function which add a product to the shopping basket
+     * @param $email
+     * @param $idProduct
+     * @param $quantity
+     * @return bool
+     * 
+     */
+    function addProductToShoppingBasket($email, $idProduct, $quantity)
+    {
+        static $ps = null;
+        $answer = false;
+        if (orderExist($email))
+        {
+            if (productOrderedExists($email, $idProduct))
+            {
+                updateRemainingNumber($quantity, $idProduct, true);
+                $sql = "UPDATE PRODUCT_ORDERED SET quantity = :QUANTITY WHERE idProduct = :ID_PRODUCT AND idOrder = (SELECT idOrder FROM ORDERED WHERE email = :EMAIL AND isPaid = 0);";
+                if ($ps == null) 
+                {
+                    $ps = dbConnect()->prepare($sql);
+                }
+                try {
+                    $ps->bindParam(':ID_PRODUCT', $idProduct, PDO::PARAM_INT);
+                    $ps->bindParam(':QUANTITY', $quantity, PDO::PARAM_INT);
+                    $answer = $ps->execute();
+                } 
+                catch (PDOException $e) {
+                    echo $e->getMessage();
+                }
+            }
+            else {
+                $sql = "INSERT INTO PRODUCT_ORDERED (`idProduct`, `idOrder`, `quantity`) VALUES (:ID_PRODUCT, (SELECT idOrder FROM ORDERED WHERE email = :EMAIL AND isPaid = 0), :QUANTITY);";
+                if ($ps == null) 
+                {
+                    $ps = dbConnect()->prepare($sql);
+                }
+                try {
+                    $ps->bindParam(':ID_PRODUCT', $idProduct, PDO::PARAM_INT);
+                    $ps->bindParam(':EMAIL', $email, PDO::PARAM_STR);
+                    $ps->bindParam(':QUANTITY', $quantity, PDO::PARAM_INT);
+                    $answer = $ps->execute();
+                } 
+                catch (PDOException $e) {
+                    echo $e->getMessage();
+                }
+            }
+        }
+        else {
+            newOrder($email, 0);
+            $answer = addProductToShoppingBasket($email, $idProduct, $quantity);
+        }
+        return $answer;
+    }
+
+    /**
+     * Function which return the products which are in the shopping basket
+     * @return bool|array
+     * 
+     */
+    function getUserQuantityForProduct()
+    {
+        static $ps = null;
+        $sql = 'SELECT quantity FROM PRODUCT_ORDERED WHERE idProduct = :ID_PRODUCT AND idOrder = :ID_ORDER;';
+        if ($ps == null)
+        {
+            $ps = dbConnect()->prepare($sql);
+        }
+        $answer = false;
+        try {
+            $ps->bindParam(':ID_PRODUCT', $idProduct, PDO::PARAM_INT);
+            $ps->bindParam(':ID_PRODUCT', $idProduct, PDO::PARAM_INT);
+            if ($ps->execute())
+            {
+                $answer = $ps->fetchAll(PDO::FETCH_ASSOC);
+            }
+        } 
+        catch (PDOException $e) {
+            echo $e->getMessage();
+        }
+        return $answer[0]['remainingNumber'];
+    }
+
+
+    function updateRemainingNumber($quantity, $idProduct, $hasReduce)
+    {
+        $remainingNumber = getQuantity($idProduct);
+        if ($hasReduce)
+        {
+            $remainingNumber -= $quantity;
+        }
+        else {
+            $remainingNumber += $quantity;
+        }
+        updateQuantity($idProduct, $remainingNumber);
+    }
+
+    /**
+     * Function which update the quantity of a product
+     * @param $idProduct
+     * @param $quantity
+     * @return bool
+     * 
+     */
+    function updateQuantity($idProduct, $quantity)
+    {
+        static $ps = null;
+        $sql = "UPDATE PRODUCT SET remainingNumber = :QUANTITY WHERE idProduct = :ID_PRODUCT;";
+        if ($ps == null) 
+        {
+            $ps = dbConnect()->prepare($sql);
+        }
+        $answer = false;
+        try {
+            $ps->bindParam(':QUANTITY', $quantity, PDO::PARAM_INT);
+            $ps->bindParam(':ID_PRODUCT', $idProduct, PDO::PARAM_INT);
+            $answer = $ps->execute();
+        } 
+        catch (PDOException $e) {
+            echo $e->getMessage();
+        }
+        return $answer;
+    }
+
+    /**
+     * Function which return the quantity of a product
+     * @param $idProduct
+     * @return int
+     */
+    function getQuantity($idProduct) 
+    {
+        static $ps = null;
+        $sql = 'SELECT remainingNumber FROM PRODUCT WHERE idProduct = :ID_PRODUCT;';
+        if ($ps == null)
+        {
+            $ps = dbConnect()->prepare($sql);
+        }
+        $answer = false;
+        try {
+            $ps->bindParam(':ID_PRODUCT', $idProduct, PDO::PARAM_INT);
+            if ($ps->execute())
+            {
+                $answer = $ps->fetchAll(PDO::FETCH_ASSOC);
+            }
+        } 
+        catch (PDOException $e) {
+            echo $e->getMessage();
+        }
+        return $answer[0]['remainingNumber'];
+    }
+
+    /**
+     * Function which check if the user has already ordered a product
+     * @param string $email
+     * @param int $idProduct
+     * @return bool|array
+     * 
+     */
+    function productOrderedExists($email, $idProduct)
+    {
+        static $ps = null;
+        $sql = 'SELECT * FROM PRODUCT_ORDERED JOIN ORDERED ON PRODUCT_ORDERED.idOrder = ORDERED.idOrder WHERE isPaid = 0 AND EMAIL = :EMAIL AND idProduct = :ID_PRODUCT;';
+        if ($ps == null)
+        {
+            $ps = dbConnect()->prepare($sql);
+        }
+        $answer = false;
+        try {
+            $ps->bindParam(':EMAIL', $email, PDO::PARAM_STR);
+            $ps->bindParam(':ID_PRODUCT', $idProduct, PDO::PARAM_STR);
+            if ($ps->execute())
+            {
+                $answer = $ps->fetchAll(PDO::FETCH_ASSOC);
+            }
+        } 
+        catch (PDOException $e) {
+            echo $e->getMessage();
+        }
+        return $answer;
+    }
+
+    /**
+     * Function which check if an order is already "active" for a user
+     * @param string $email
+     * @return bool|array
+     * 
+     */
+    function orderExist($email)
+    {
+        static $ps = null;
+        $sql = 'SELECT * FROM ORDERED WHERE isPaid = 0 AND EMAIL = :EMAIL;';
+        if ($ps == null)
+        {
+            $ps = dbConnect()->prepare($sql);
+        }
+        $answer = false;
+        try {
+            $ps->bindParam(':EMAIL', $email, PDO::PARAM_STR);
+            if ($ps->execute())
+            {
+                $answer = $ps->fetchAll(PDO::FETCH_ASSOC);
+            }
+        } 
+        catch (PDOException $e) {
+            echo $e->getMessage();
+        }
+        return $answer;
+    }
+
+    /**
+     * Function which create an "active" order for the user in the database
+     * @param $email
+     * @param $totalPrice
+     * @return bool
+     * 
+     */
+    function newOrder($email, $totalPrice)
+    {
+        static $ps = null;
+        $sql = "INSERT INTO ORDERED (`isPaid`, `isSent`, `totalPrice`, `email`) VALUES (0, 0, :TOTAL_PRICE, :EMAIL);";
+        if ($ps == null) 
+        {
+            $ps = dbConnect()->prepare($sql);
+        }
+        $answer = false;
+        try {
+            $ps->bindParam(':EMAIL', $email, PDO::PARAM_STR);
+            $ps->bindParam(':TOTAL_PRICE', $totalPrice, PDO::PARAM_STR);
+            $answer = $ps->execute();
         } 
         catch (PDOException $e) {
             echo $e->getMessage();

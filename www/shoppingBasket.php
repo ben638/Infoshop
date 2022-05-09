@@ -4,11 +4,18 @@
      * IFA-P3B
      * CFPT Informatique
      * TPI 2022
-     * Page panier du site Infoshop
+     * Infoshop shopping basket page
      * 
      */
     $dir = "./";
     session_start();
+    require $dir . "lib/functions.inc.php";
+    if (!isset($_SESSION["email"]))
+    {
+        header("Location: " . $dir . "login.php");
+        exit(0);
+    }
+    $products = getProducts();
 ?>
 <!DOCTYPE html>
 <html>
@@ -22,6 +29,7 @@
     <link rel="stylesheet" href="assets/fonts/simple-line-icons.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/baguettebox.js/1.11.1/baguetteBox.min.css">
     <link rel="stylesheet" href="assets/css/vanilla-zoom.min.css">
+    <link rel="stylesheet" href="css/style.css">
 </head>
 
 <body>
@@ -39,66 +47,29 @@
                     <div class="row g-0">
                         <div class="col-md-12 col-lg-8">
                             <div class="items">
-                                <div class="product">
-                                    <div class="row justify-content-center align-items-center">
-                                        <div class="col-md-3">
-                                            <div class="product-image"><img class="img-fluid d-block mx-auto image" src="assets/img/tech/image2.jpg"></div>
-                                        </div>
-                                        <div class="col-md-5 product-info"><a class="product-name" href="#">Lorem Ipsum dolor</a>
-                                            <div class="product-specs">
-                                                <div></div>
-                                                <div>
-                                                    <p>Description</p>
-                                                </div>
-                                                <div></div>
+                                <?php 
+                                    foreach ($products as $product)
+                                    {
+                                        echo "<div class=\"product\">
+                                        <div class=\"row justify-content-center align-items-center\">
+                                            <div class=\"col-md-3\">
+                                                <div class=\"product-image\"><img class=\"img-fluid d-block mx-auto image\" src=\"" . PICTURES_FOLDER . $products[$productId]["fileName"] . "\"></div>
                                             </div>
-                                        </div>
-                                        <div class="col-6 col-md-2 quantity"><label class="form-label d-none d-md-block" for="quantity">Quantité</label><input type="number" id="number" class="form-control quantity-input" value="1"><button class="btn btn-primary" type="button" style="margin-top: 10px;"><img src="assets/img/icons8-modifier.svg"></button></div>
-                                        <div class="col-6 col-md-2 price"><span>$120</span><button class="btn btn-primary" type="button" style="margin-left: 10px;"><img src="assets/img/icons8-poubelle.svg"></button></div>
-                                    </div>
-                                    <div class="product"></div>
-                                    <div class="product"></div>
-                                    <div class="product">
-                                        <div class="row justify-content-center align-items-center">
-                                            <div class="col-md-3">
-                                                <div class="product-image"><img class="img-fluid d-block mx-auto image" src="assets/img/tech/image2.jpg"></div>
-                                            </div>
-                                            <div class="col-md-5 product-info"><a class="product-name" href="#">Lorem Ipsum dolor</a>
-                                                <div class="product-specs">
+                                            <div class=\"col-md-5 product-info\"><a class=\"product-name\" href=\"productDetails.php?productId=" . $productId . "\">" . $products[$productId]["productName"] . "</a>
+                                                <div class=\"product-specs\">
                                                     <div></div>
                                                     <div>
-                                                        <p>Description</p>
+                                                        <p>" . $products[$productId]["description"] . "</p>
                                                     </div>
                                                     <div></div>
                                                 </div>
                                             </div>
-                                            <div class="col-6 col-md-2 quantity"><label class="form-label d-none d-md-block" for="quantity">Quantité</label><input type="number" id="number-1" class="form-control quantity-input" value="1"><button class="btn btn-primary" type="button" style="margin-top: 10px;"><img src="assets/img/icons8-modifier.svg"></button></div>
-                                            <div class="col-6 col-md-2 price"><span>$120</span><button class="btn btn-primary" type="button" style="margin-left: 10px;"><img src="assets/img/icons8-poubelle.svg"></button></div>
+                                            <div class=\"col-6 col-md-2 quantity\"><label class=\"form-label d-none d-md-block\" for=\"quantity\">Quantité</label><input type=\"number\" id=\"number\" class=\"form-control quantity-input\" value=\"$quantity\"><button class=\"btn btn-primary\" type=\"button\" style=\"margin-top: 10px;\"><img src=\"assets/img/icons8-modifier.svg\"></button></div>
+                                            <div class=\"col-6 col-md-2 price\"><span id=\"productPrice\">" . $products[$productId]["priceInCHF"] . " CHF</span><br><button class=\"btn btn-primary\" type=\"button\" style=\"margin-left: 10px;\"><img src=\"assets/img/icons8-poubelle.svg\"></button></div>
                                         </div>
-                                        <div class="product"></div>
-                                        <div class="product"></div>
-                                    </div>
-                                    <div class="product">
-                                        <div class="row justify-content-center align-items-center">
-                                            <div class="col-md-3">
-                                                <div class="product-image"><img class="img-fluid d-block mx-auto image" src="assets/img/tech/image2.jpg"></div>
-                                            </div>
-                                            <div class="col-md-5 product-info"><a class="product-name" href="#">Lorem Ipsum dolor</a>
-                                                <div class="product-specs">
-                                                    <div></div>
-                                                    <div>
-                                                        <p>Description</p>
-                                                    </div>
-                                                    <div></div>
-                                                </div>
-                                            </div>
-                                            <div class="col-6 col-md-2 quantity"><label class="form-label d-none d-md-block" for="quantity">Quantité</label><input type="number" id="number-2" class="form-control quantity-input" value="1"><button class="btn btn-primary" type="button" style="margin-top: 10px;"><img src="assets/img/icons8-modifier.svg"></button></div>
-                                            <div class="col-6 col-md-2 price"><span>$120</span><button class="btn btn-primary" type="button" style="margin-left: 10px;"><img src="assets/img/icons8-poubelle.svg"></button></div>
-                                        </div>
-                                        <div class="product"></div>
-                                        <div class="product"></div>
-                                    </div>
-                                </div>
+                                    </div>";
+                                    }
+                                ?>
                             </div>
                         </div>
                         <div class="col-md-12 col-lg-4">

@@ -4,7 +4,7 @@
      * IFA-P3B
      * CFPT Informatique
      * TPI 2022
-     * Page d'inscription du site Infoshop
+     * Infoshop registration page
      * 
      */
     $dir = "./";

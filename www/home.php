@@ -4,7 +4,7 @@
      * IFA-P3B
      * CFPT Informatique
      * TPI 2022
-     * Page d'accueil du site Infoshop qui affiche les produits
+     * Infoshop home page which displays the products
      * 
      */
     $dir = "./";

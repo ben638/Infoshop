@@ -4,11 +4,30 @@
      * IFA-P3B
      * CFPT Informatique
      * TPI 2022
-     * Page des détails d'un produit du site Infoshop
+     * Infoshop product details page
      * 
      */
     $dir = "./";
     session_start();
+    require $dir . "lib/functions.inc.php";
+    if (!isset($_GET["productId"]))
+    {
+        header("Location: " . $dir . "index.php");
+        exit(0);
+    }
+    $productId = htmlspecialchars($_GET["productId"]);
+    if (!is_numeric($productId))
+    {
+        header("Location: " . $dir . "index.php");
+        exit(0);
+    }
+    if (isset($_POST["quantityToAdd"]))
+    {
+        $quantityToAdd = htmlspecialchars($_POST["quantityToAdd"]);
+        addProductToShoppingBasket($_SESSION["email"], $productId, $quantityToAdd);
+    }
+    $product = getProduct($productId);
+    $pictures = getPictures($productId);
 ?>
 <!DOCTYPE html>
 <html>
@@ -32,8 +51,7 @@
         <section class="clean-block clean-product dark">
             <div class="container">
                 <div class="block-heading">
-                    <h2 class="text-info">Product Page</h2>
-                    <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nunc quam urna, dignissim nec auctor in, mattis vitae leo.</p>
+                    <h2 class="text-info">Détails du produit</h2>
                 </div>
                 <div class="block-content">
                     <div class="product-info">
@@ -42,19 +60,29 @@
                                 <div class="gallery">
                                     <div id="product-preview" class="vanilla-zoom">
                                         <div class="zoomed-image"></div>
-                                        <div class="sidebar"><img class="img-fluid d-block small-preview" src="assets/img/tech/image1.jpg"><img class="img-fluid d-block small-preview" src="assets/img/tech/image2.jpg"><img class="img-fluid d-block small-preview" src="assets/img/tech/image1.jpg"></div>
+                                        <div class="sidebar">
+                                            <?php 
+                                                foreach ($pictures as $picture)
+                                                {
+                                                    echo "<img class=\"img-fluid d-block small-preview\" src=\"" . PICTURES_FOLDER . $picture["fileName"] . "\">";
+                                                }
+                                            ?>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
                             <div class="col-md-6">
                                 <div class="info">
-                                    <h3>Nom de l'article</h3>
+                                    <h3><?php echo $product["productName"]; ?></h3>
                                     <div class="rating"></div>
-                                    <div class="price">
-                                        <h3>$300.00</h3><input type="number" style="width: 80px;">
-                                    </div><button class="btn btn-primary" type="button"><i class="icon-basket"></i>Add to Cart</button>
+                                    <form action="productDetails.php?productId=<?php echo $product["idProduct"]; ?>" method="post">
+                                        <div class="price">
+                                            <h3><?php echo $product["priceInCHF"]; ?> CHF</h3><input type="number" style="width: 80px;" value="1" max="<?php echo $product["remainingNumber"]; ?>" min="1" name="quantityToAdd">
+                                            <p>Reste : <?php echo $product["remainingNumber"]; ?> produits</p>
+                                        </div><button class="btn btn-primary" type="submit"><i class="icon-basket"></i>Ajouter au panier</button>
+                                    </form>
                                     <div class="summary">
-                                        <p>Description</p>
+                                        <p><?php echo $product["description"]; ?></p>
                                     </div>
                                 </div>
                             </div>

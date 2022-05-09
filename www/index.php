@@ -4,7 +4,7 @@
      * IFA-P3B
      * CFPT Informatique
      * TPI 2022
-     * Page d'accueil du site Infoshop qui affiche les produits
+     *Infoshop home page which displays the products
      * 
      */
     $dir = "./";
@@ -16,7 +16,7 @@
         $products = searchProducts($termToSearch);
     }
     else {
-        $products = getProducts();
+        $products = getAllProducts();
     }
 ?>
 <!DOCTYPE html>
@@ -25,7 +25,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no">
-    <title>Blog - Shopinfo</title>
+    <title>Accueil - Shopinfo</title>
     <link rel="stylesheet" href="assets/bootstrap/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Montserrat:400,400i,700,700i,600,600i&amp;display=swap">
     <link rel="stylesheet" href="assets/fonts/simple-line-icons.min.css">
@@ -49,10 +49,15 @@
                     {
                         echo "<div class=\"clean-blog-post\">
                                 <div class=\"row\">
-                                    <div class=\"col-lg-5\"><a href=\"#\"><img class=\"img-fluid d-block mx-auto\" src=\"" . PICTURES_FOLDER . $product["fileName"] . "\"></a></div>
+                                    <div class=\"col-lg-5\"><a href=\"" . $dir . "productDetails.php?productId=" . $product["idProduct"] . "\"><img class=\"img-fluid d-block mx-auto\" src=\"" . PICTURES_FOLDER . $product["fileName"] . "\"></a></div>
                                     <div class=\"col-lg-7\">
-                                        <h3><a href=\"" . $dir . "productDetails.php?productId\">" . $product["productName"] . "</a></h3>
-                                        <p>" . $product["description"] . "</p>
+                                        <h3><a href=\"" . $dir . "productDetails.php?productId=" . $product["idProduct"] . "\">" . $product["productName"] . "</a></h3>
+                                        <p>";
+                        for ($i = 0; $i < 150; $i++)
+                        {
+                            echo $product["description"][$i];
+                        }
+                        echo "...</p>
                                         <p>" . $product["priceInCHF"] . " CHF</p>
                                     </div>
                                 </div>
