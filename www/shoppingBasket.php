@@ -15,7 +15,7 @@
         header("Location: " . $dir . "login.php");
         exit(0);
     }
-    $products = getProducts();
+    $products = getShoppingBasket($_SESSION["email"]);
 ?>
 <!DOCTYPE html>
 <html>
@@ -47,35 +47,41 @@
                     <div class="row g-0">
                         <div class="col-md-12 col-lg-8">
                             <div class="items">
-                                <?php 
+                                <?php
+                                    $totalPrice = 0;
                                     foreach ($products as $product)
                                     {
+                                        $totalPrice += $product["priceInCHF"] * $product["quantity"];
                                         echo "<div class=\"product\">
                                         <div class=\"row justify-content-center align-items-center\">
                                             <div class=\"col-md-3\">
-                                                <div class=\"product-image\"><img class=\"img-fluid d-block mx-auto image\" src=\"" . PICTURES_FOLDER . $products[$productId]["fileName"] . "\"></div>
+                                                <div class=\"product-image\"><img class=\"img-fluid d-block mx-auto image\" src=\"" . PICTURES_FOLDER . $product["fileName"] . "\"></div>
                                             </div>
-                                            <div class=\"col-md-5 product-info\"><a class=\"product-name\" href=\"productDetails.php?productId=" . $productId . "\">" . $products[$productId]["productName"] . "</a>
+                                            <div class=\"col-md-5 product-info\"><a class=\"product-name\" href=\"productDetails.php?productId=" . $product["idProduct"] . "\">" . $product["productName"] . "</a>
                                                 <div class=\"product-specs\">
                                                     <div></div>
                                                     <div>
-                                                        <p>" . $products[$productId]["description"] . "</p>
+                                                        <p>" . $product["description"] . "</p>
                                                     </div>
                                                     <div></div>
                                                 </div>
                                             </div>
-                                            <div class=\"col-6 col-md-2 quantity\"><label class=\"form-label d-none d-md-block\" for=\"quantity\">Quantité</label><input type=\"number\" id=\"number\" class=\"form-control quantity-input\" value=\"$quantity\"><button class=\"btn btn-primary\" type=\"button\" style=\"margin-top: 10px;\"><img src=\"assets/img/icons8-modifier.svg\"></button></div>
-                                            <div class=\"col-6 col-md-2 price\"><span id=\"productPrice\">" . $products[$productId]["priceInCHF"] . " CHF</span><br><button class=\"btn btn-primary\" type=\"button\" style=\"margin-left: 10px;\"><img src=\"assets/img/icons8-poubelle.svg\"></button></div>
+                                            <div class=\"col-6 col-md-2 quantity\"><label class=\"form-label d-none d-md-block\" for=\"quantity\">Quantité</label><input type=\"number\" id=\"number\" class=\"form-control quantity-input\" value=\"" . $product["quantity"] . "\"><button class=\"btn btn-primary\" type=\"button\" style=\"margin-top: 10px;\"><img src=\"assets/img/icons8-modifier.svg\"></button></div>
+                                            <div class=\"col-6 col-md-2 price\"><span id=\"productPrice\">" . $product["priceInCHF"] . " CHF</span><br><button class=\"btn btn-primary\" type=\"button\" style=\"margin-left: 10px;\"><img src=\"assets/img/icons8-poubelle.svg\"></button></div>
                                         </div>
-                                    </div>";
+                                        </div>";
                                     }
+                                    updateTotalPrice($totalPrice, $_SESSION["email"]);
                                 ?>
                             </div>
                         </div>
                         <div class="col-md-12 col-lg-4">
                             <div class="summary">
-                                <h3>Récapitulatif</h3>
-                                <h4><span class="text">Total</span><span class="price">$360</span></h4><button class="btn btn-primary btn-lg d-block w-100" type="button">Payer</button>
+                                <form action="paymentPage.php" method="post">
+                                    <h3>Récapitulatif</h3>
+                                    <h4><span class="text">Total</span><span class="price"><?php echo $totalPrice; ?> CHF</span></h4><button class="btn btn-primary btn-lg d-block w-100" type="submit">Payer</button>
+                                    <input type="hidden" name="goToPaymentPage">
+                                </form>
                             </div>
                         </div>
                     </div>

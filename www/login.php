@@ -18,15 +18,19 @@
     {
         require $dir . "lib/functions.inc.php";
         $email = htmlspecialchars($_POST["email"]);
-        $passwordHash = hash('sha256', htmlspecialchars($_POST['password']));
+        $password = htmlspecialchars($_POST['password']);
         $userInfo = getUserInfo($email);
         if (!$userInfo)
         {
             $accountErrorMessage = "Votre compte n'existe pas";
         }
-        else if ($username == $userInfo['username'] && $passwordHash == $userInfo['passwordHash'])
+        else if ($email == $userInfo['email'] && password_verify($password, $userInfo['passwordHash']))
         {
             $_SESSION['email'] = $email;
+            if ($userInfo["isAdmin"])
+            {
+                $_SESSION['isAdmin'] = true;
+            }
             header('Location: profil.php');
             exit(0);
         }

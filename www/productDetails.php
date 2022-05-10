@@ -25,6 +25,8 @@
     {
         $quantityToAdd = htmlspecialchars($_POST["quantityToAdd"]);
         addProductToShoppingBasket($_SESSION["email"], $productId, $quantityToAdd);
+        header("Location: " . $dir . "productDetails.php?productId=" . $productId);
+        exit(0);
     }
     $product = getProduct($productId);
     $pictures = getPictures($productId);

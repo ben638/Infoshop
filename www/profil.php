@@ -9,11 +9,40 @@
      */
     $dir = "./";
     session_start();
+    require $dir . "lib/functions.inc.php";
     if (!isset($_SESSION["email"]))
     {
         header("Location: " . $dir . "login.php");
         exit(0);
     }
+    if (isset($_POST["newEmail"]) && isset($_POST["password"]) && isset($_POST["passwordConfirm"]) && isset($_POST["streetName"]) && isset($_POST["streetNumber"]) && isset($_POST["postalCode"]) && isset($_POST["city"]))
+    {
+        
+        $newEmail = htmlspecialchars($_POST["newEmail"]);
+        $passwordHash = password_hash(htmlspecialchars($_POST['password']), PASSWORD_DEFAULT);
+        $passwordConfirm = htmlspecialchars($_POST['passwordConfirm']);
+        $streetName = htmlspecialchars($_POST["streetName"]);
+        $streetNumber = htmlspecialchars($_POST["streetNumber"]);
+        $postalCode = htmlspecialchars($_POST["postalCode"]);
+        $city = htmlspecialchars($_POST["city"]);
+        $success = false;
+        if (password_verify($passwordConfirm, $passwordHash))
+        {
+            $success = updateProfil($_SESSION["email"], $newEmail, $passwordHash, $streetName, $streetNumber, $postalCode, $city);
+        }
+        else
+        {
+            $passwordMessageError = "Les mots de passe ne correspondent pas";
+        }
+        if ($success)
+        {
+            $_SESSION['email'] = $newEmail;
+        }
+        else {
+            $emailErrorMessage = "L'email est déjà utilisé";
+        }
+    }
+    $profil = checkUserExists($_SESSION["email"])[0];
 ?>
 <!DOCTYPE html>
 <html>
@@ -40,10 +69,21 @@
                     <h2 class="text-info">Profil</h2>
                     <p>Vous pouvez modifier vos informations personnelles ici</p>
                 </div>
-                <form>
-                    <div class="mb-3"><label class="form-label" for="name">Name</label><input class="form-control item" type="text" id="name"></div>
-                    <div class="mb-3"><label class="form-label" for="password">Password</label><input class="form-control item" type="password" id="password"></div>
-                    <div class="mb-3"><label class="form-label" for="email">Email</label><input class="form-control item" type="email" id="email"></div><button class="btn btn-primary" type="submit">Sign Up</button>
+                <form action="profil.php" method="post">
+                    <div class="mb-3"><label class="form-label" for="newEmail">Email</label><input class="form-control item" type="email" id="newEmail" name="newEmail" value="<?php echo $profil["email"]; ?>" required></div>
+                    <div class="mb-3"><p><?php echo $emailErrorMessage ?></p></div>
+                    <div class="mb-3"><label class="form-label" for="password">Mot de passe</label><input class="form-control item" type="password" id="password" name="password" required></div>
+                    <div class="mb-3"><label class="form-label" for="passwordConfirm">Ré-entrer votre mot de passe</label><input class="form-control item" type="password" id="passwordConfirm" name="passwordConfirm" required></div>
+                    <div class="mb-3"><p><?php echo $passwordMessageError ?></p></div>
+                    <fieldset>
+                        <legend>Adresse</legend>
+                        <div class="mb-3"><label class="form-label" for="email">Rue</label><input class="form-control item" type="text" id="streetName" name="streetName" value="<?php echo $profil["streetName"]; ?>" required>
+                            <div class="mb-3"><label class="form-label" for="email">N°</label><input class="form-control item" type="text" id="streetNumber" name="streetNumber" value="<?php echo $profil["streetNumber"]; ?>" required></div>
+                        </div>
+                        <div class="mb-3"><label class="form-label" for="email">Code postal</label><input class="form-control item" type="text" id="postalCode" name="postalCode" value="<?php echo $profil["postalCode"]; ?>" required></div>
+                        <div class="mb-3"><label class="form-label" for="email">Ville</label><input class="form-control item" type="text" id="city" name="city" value="<?php echo $profil["city"]; ?>" required></div>
+                    </fieldset><button class="btn btn-primary" type="submit">Modifier mon profil</button>
+                
                 </form>
             </div>
         </section>

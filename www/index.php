@@ -4,7 +4,7 @@
      * IFA-P3B
      * CFPT Informatique
      * TPI 2022
-     *Infoshop home page which displays the products
+     * Infoshop home page which displays the products
      * 
      */
     $dir = "./";
@@ -44,7 +44,11 @@
                     <h2 class="text-info">Nos produits en vente</h2>
                 </div><input type="search" style="margin-bottom: 30px;height: 32px;width: 310px;" placeholder="Rechercher par nom ou description"><button class="btn btn-primary" type="button" style="margin-left: 15px;margin-top: -1px;width: 50px;height: 32px;padding-top: 0px;padding-bottom: 0px;"><img src="assets/img/icons8-chercher.svg"></button>
                 <div class="block-content">
-                <?php 
+                <?php
+                    if (isset($_SESSION["isAdmin"]))
+                    {
+                        echo "<button class=\"btn btn-primary\" type=\"button\" style=\"margin-top: 10px;\"><img src=\"assets/img/icons8-plus.svg\"></button>";
+                    }
                     foreach ($products as $product) 
                     {
                         echo "<div class=\"clean-blog-post\">
@@ -57,23 +61,15 @@
                         {
                             echo $product["description"][$i];
                         }
-                        echo "...</p>
-                                        <p>" . $product["priceInCHF"] . " CHF</p>
-                                    </div>
-                                </div>
-                            </div>";
+                        echo "...</p><p>" . $product["priceInCHF"] . " CHF</p>";
+                        if (isset($_SESSION["isAdmin"]))
+                        {
+                            echo "<button class=\"btn btn-primary\" type=\"button\" style=\"margin-top: 10px;\"><img src=\"assets/img/icons8-modifier.svg\"></button>";
+                            echo "<button class=\"btn btn-primary\" type=\"button\" style=\"margin-top: 10px;\"><img src=\"assets/img/icons8-poubelle.svg\"></button>";
+                        }
+                        echo "</div></div></div>";
                     }
                 ?>
-                    <div class="clean-blog-post">
-                        <div class="row">
-                            <div class="col-lg-5"><img class="rounded img-fluid" src="assets/img/tech/image4.jpg"></div>
-                            <div class="col-lg-7">
-                                <h3>Titre</h3>
-                                <p>Description</p>
-                                <p>Prix</p>
-                            </div>
-                        </div>
-                    </div>
                 </div>
             </div>
         </section>

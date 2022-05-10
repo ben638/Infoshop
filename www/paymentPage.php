@@ -9,11 +9,18 @@
      */
     $dir = "./";
     session_start();
-    if (isset($_SESSION["email"]))
+    require $dir . "lib/functions.inc.php";
+    if (!isset($_SESSION["email"]))
     {
         header("Location: " . $dir . "index.php");
         exit(0);
     }
+    if (!isset($_POST["goToPaymentPage"]))
+    {
+        header("Location: " . $dir . "index.php");
+        exit(0);
+    }
+    $shoppingBasket = orderExist($_SESSION["email"])[0];
 ?>
 <!DOCTYPE html>
 <html>
@@ -47,10 +54,10 @@
                             <p class="item-name">IBAN</p>
                             <p class="item-description">Merci de procéder au virement bancaire, dès sa réception votre commande sera expédiée</p>
                         </div>
-                        <div class="item"><span class="price">no commande</span>
+                        <div class="item"><span class="price"><?php echo $shoppingBasket["idOrder"]; ?></span>
                             <p class="item-name">Commande N°</p>
                         </div>
-                        <div class="total"><span>Total</span><span class="price">$320</span></div><button class="btn btn-primary" type="button" style="margin-top: 20px;">Continuer mes achats</button><button class="btn btn-primary" type="button" style="margin-top: 20px;margin-left: 20px;">Payer</button>
+                        <div class="total"><span>Total</span><span class="price"><?php echo $shoppingBasket["totalPrice"]; ?> CHF</span></div><button class="btn btn-primary" type="button" style="margin-top: 20px;">Continuer mes achats</button><button class="btn btn-primary" type="button" style="margin-top: 20px;margin-left: 20px;">J'ai payé</button>
                     </div>
                 </form>
             </div>

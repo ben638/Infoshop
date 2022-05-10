@@ -22,7 +22,7 @@ accessPath
 m1=1..*
 m2=1..*
 have</panel_attributes><additional_attributes>10;20;240;20</additional_attributes></element><element><id>UMLClass</id><coordinates><x>650</x><y>880</y><w>150</w><h>30</h></coordinates><panel_attributes>isDefaultPicture
-</panel_attributes><additional_attributes></additional_attributes></element><element><id>Relation</id><coordinates><x>710</x><y>820</y><w>30</w><h>80</h></coordinates><panel_attributes>lt=.</panel_attributes><additional_attributes>10;60;10;10</additional_attributes></element><element><id>UMLClass</id><coordinates><x>390</x><y>560</y><w>210</w><h>110</h></coordinates><panel_attributes>*ORDER*
+</panel_attributes><additional_attributes></additional_attributes></element><element><id>Relation</id><coordinates><x>710</x><y>820</y><w>30</w><h>80</h></coordinates><panel_attributes>lt=.</panel_attributes><additional_attributes>10;60;10;10</additional_attributes></element><element><id>UMLClass</id><coordinates><x>390</x><y>560</y><w>210</w><h>110</h></coordinates><panel_attributes>*ORDERED*
 --
 *_idOrder_*
 isPaid
