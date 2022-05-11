@@ -47,9 +47,9 @@
                 <?php
                     if (isset($_SESSION["isAdmin"]))
                     {
-                        echo "<button class=\"btn btn-primary\" type=\"button\" style=\"margin-top: 10px;\"><img src=\"assets/img/icons8-plus.svg\"></button>";
+                        echo "<a href=\"" . $dir . "addProduct.php\"><button class=\"btn btn-primary\" type=\"button\" style=\"margin-top: 10px;\"><img src=\"assets/img/icons8-plus.svg\"></button></a>";
                     }
-                    foreach ($products as $product) 
+                    foreach ($products as $product)
                     {
                         echo "<div class=\"clean-blog-post\">
                                 <div class=\"row\">
@@ -64,7 +64,7 @@
                         echo "...</p><p>" . $product["priceInCHF"] . " CHF</p>";
                         if (isset($_SESSION["isAdmin"]))
                         {
-                            echo "<button class=\"btn btn-primary\" type=\"button\" style=\"margin-top: 10px;\"><img src=\"assets/img/icons8-modifier.svg\"></button>";
+                            echo "<a href=\"" . $dir . "addProduct.php?idProductToUpdate=" . $product["idProduct"] . "\"><button class=\"btn btn-primary\" type=\"button\" style=\"margin-top: 10px;\"><img src=\"assets/img/icons8-modifier.svg\"></button></a>";
                             echo "<button class=\"btn btn-primary\" type=\"button\" style=\"margin-top: 10px;\"><img src=\"assets/img/icons8-poubelle.svg\"></button>";
                         }
                         echo "</div></div></div>";

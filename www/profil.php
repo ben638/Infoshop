@@ -17,7 +17,6 @@
     }
     if (isset($_POST["newEmail"]) && isset($_POST["password"]) && isset($_POST["passwordConfirm"]) && isset($_POST["streetName"]) && isset($_POST["streetNumber"]) && isset($_POST["postalCode"]) && isset($_POST["city"]))
     {
-        
         $newEmail = htmlspecialchars($_POST["newEmail"]);
         $passwordHash = password_hash(htmlspecialchars($_POST['password']), PASSWORD_DEFAULT);
         $passwordConfirm = htmlspecialchars($_POST['passwordConfirm']);

@@ -315,6 +315,12 @@
         //updateQuantity($idProduct, $remainingNumber);
     }*/
 
+    /**
+     * Function which return the id of the "active" order of a user
+     * @param $email
+     * @return bool|int
+     * 
+     */
     function getIdOrder($email)
     {
         static $ps = null;
@@ -365,6 +371,13 @@
         return $answer[0]['remainingNumber'];
     }
 
+    /**
+     * Function which calculate the remaining number of a product and change it
+     * @param $quantity
+     * @param $idProduct
+     * @param $hasReduce
+     * 
+     */
     function updateRemainingNumber($quantity, $idProduct, $hasReduce)
     {
         $remainingNumber = getQuantity($idProduct);
@@ -517,6 +530,12 @@
         return $answer;
     }
 
+    /**
+     * Function which return the detailed description of an order
+     * @param $email
+     * @return bool|array
+     * 
+     */
     function getShoppingBasket($email)
     {
         static $ps = null;
@@ -539,6 +558,13 @@
         return $answer;
     }
 
+    /**
+     * Function which update the total price of an order
+     * @param $newPrice
+     * @param $email
+     * @return bool|array
+     * 
+     */
     function updateTotalPrice($newPrice, $email)
     {
         $idOrder = orderExist($email)[0]['idOrder'];
@@ -560,6 +586,17 @@
         return $answer;
     }
 
+    /**
+     * Function which update the profil of an user
+     * @param $oldEmail
+     * @param $newEmail
+     * @param $passwordHash
+     * @param $streetName
+     * @param $streetNumber
+     * @param $postalCode
+     * @param $city
+     * 
+     */
     function updateProfil($oldEmail, $newEmail, $passwordHash, $streetName, $streetNumber, $postalCode, $city)
     {
         $answer = false;
@@ -589,6 +626,12 @@
         return $answer;
     }
 
+    /**
+     * Function which return all the orders of a user
+     * @param $email
+     * @return bool|array
+     * 
+     */
     function getOrders($email)
     {
         static $ps = null;
@@ -616,6 +659,12 @@
         return $answer;
     }
 
+    /**
+     * Function which return the order of a user
+     * @param $idOrder
+     * @return bool|array
+     * 
+     */
     function getOrder($idOrder)
     {
         static $ps = null;
@@ -638,6 +687,12 @@
         return $answer;
     }
     
+    /**
+     * Function which return the products of an order
+     * @param $idOrder
+     * @return bool|array
+     * 
+     */
     function getProductsOfAnOrder($idOrder)
     {   
         $answer = false;
@@ -660,5 +715,236 @@
             echo $e->getMessage();
         }
         return $answer;
+    }
+
+    /**
+     * Function which rename the pictures and give them a unique name
+     * @param $pictures
+     * @return array
+     * 
+     */
+    function renamePictures($pictures)
+    {
+        for ($i=0; $i < count($pictures["name"]); $i++)
+        {
+            $pictures["name"][$i] = "picture_" . date('Y-m-d-H-i-s') . "_" . uniqid() . "." . substr($pictures["type"][$i], 6);
+        }
+        return $pictures;
+    }
+
+    /**
+     * Function which add a picture to the database
+     * @param $fileName
+     * @return bool
+     * 
+     */
+    function addPicture($fileName)
+    {
+        static $ps = null;
+        $sql = "INSERT INTO `PICTURE` (`fileName`) VALUES (:FILENAME);";
+        
+        if ($ps == null) 
+        {
+            $ps = dbConnect()->prepare($sql);
+        }
+        $answer = false;
+        try {
+            $ps->bindParam(':FILENAME', $fileName, PDO::PARAM_STR);
+            $answer = $ps->execute();
+        } catch (PDOException $e) {
+            echo $e->getMessage();
+        }
+        return $answer;
+    }
+
+    /**
+     * Function which link a picture to a product
+     * @param $idProduct
+     * @param $idPicture
+     * @param $isDefaultPicture
+     * @return bool
+     * 
+     */
+    function linkPictureToProduct($idProduct, $idPicture, $isDefaultPicture)
+    {
+        static $ps = null;
+        $sql = "INSERT INTO `PICTURE_PRODUCT` (`idProduct`, `idPicture`, `isDefaultPicture`) VALUES (:ID_PRODUCT, :ID_PICTURE, :IS_DEFAULT_PICTURE);";
+        
+        if ($ps == null) 
+        {
+            $ps = dbConnect()->prepare($sql);
+        }
+        $answer = false;
+        try {
+            $ps->bindParam(':ID_PRODUCT', $idProduct, PDO::PARAM_INT);
+            $ps->bindParam(':ID_PICTURE', $idPicture, PDO::PARAM_INT);
+            $ps->bindParam(':IS_DEFAULT_PICTURE', $isDefaultPicture, PDO::PARAM_BOOL);
+        
+            $answer = $ps->execute();
+        } catch (PDOException $e) {
+            echo $e->getMessage();
+        }
+        return $answer;
+    }
+
+    /**
+     * Function which add a product to the database
+     * @param $productName
+     * @param $description
+     * @param $priceInCHF
+     * @param $remainingNumber
+     * @return bool
+     * 
+     */
+    function addProduct($productName, $description, $priceInCHF, $remainingNumber)
+    {
+        static $ps = null;
+        $sql = "INSERT INTO `PRODUCT` (`productName`, `description`, `priceInCHF`, `remainingNumber`) VALUES (:PRODUCT_NAME, :DESCRIPTION, :PRICE_IN_CHF, :REMAINING_NUMBER);";
+        /*if ($ps == null) 
+        {
+            $pdo = dbConnect();
+            $pdo->beginTransaction();
+            $ps = $pdo->prepare($sql);
+        }*/
+        if ($ps == null) 
+        {
+            $ps = dbConnect()->prepare($sql);
+        }
+        $answer = false;
+        try {
+            $ps->bindParam(':PRODUCT_NAME', $productName, PDO::PARAM_STR);
+            $ps->bindParam(':DESCRIPTION', $description, PDO::PARAM_STR);
+            $ps->bindParam(':PRICE_IN_CHF', $priceInCHF, PDO::PARAM_STR);
+            $ps->bindParam(':REMAINING_NUMBER', $remainingNumber, PDO::PARAM_INT);
+        
+            $answer = $ps->execute();
+            
+        } catch (PDOException $e) {
+            //$pdo->rollBack();
+            echo $e->getMessage();
+        }
+        return $answer;
+    }
+
+    /**
+     * Function which add a product and them pictures to the database and in the server
+     * @param $productName
+     * @param $description
+     * @param $priceInCHF
+     * @param $remainingNumber
+     * @param $hasOthersPictures
+     * @param $defaultPicture
+     * @param $othersPictures
+     * 
+     */
+    function addProductWithPictures($productName, $description, $priceInCHF, $remainingNumber, $hasOthersPictures, $defaultPicture, $othersPictures)
+    {
+        addProduct($productName, $description, $priceInCHF, $remainingNumber);
+        $idProduct = getIdProduct($productName, $description, $priceInCHF, $remainingNumber);
+        addPicture($defaultPicture["name"][0]);
+        $idPicture = getIdPicture($defaultPicture["name"][0]);
+        linkPictureToProduct($idProduct, $idPicture, true);
+        if ($hasOthersPictures)
+        {
+            for ($i=0; $i < count($othersPictures["name"]); $i++) 
+            {
+                addPicture($othersPictures["name"][$i]);
+                $idPicture = getIdPicture($othersPictures["name"][$i]);
+                linkPictureToProduct($idProduct, $idPicture, false);
+            }
+        }
+        savePictures($defaultPicture);
+        savePictures($othersPictures);
+    }
+
+    /**
+     * Function which return the id of a picture
+     * @param $fileName
+     * @return int
+     * 
+     */
+    function getIdPicture($fileName)
+    {
+        static $ps = null;
+        $sql = 'SELECT idPicture FROM PICTURE WHERE fileName = :FILENAME;';
+
+        if ($ps == null)
+        {
+            $ps = dbConnect()->prepare($sql);
+        }
+        $answer = false;
+        try {
+            $ps->bindParam(':FILENAME', $fileName, PDO::PARAM_STR);
+            if ($ps->execute())
+            {
+                $answer = $ps->fetchAll(PDO::FETCH_ASSOC);
+            }
+        } 
+        catch (PDOException $e) {
+            echo $e->getMessage();
+        }
+        return $answer[0]["idPicture"];
+    }
+
+    /**
+     * Function which return the id of a product
+     * @param $productName
+     * @param $description
+     * @param $priceInCHF
+     * @param $remainingNumber
+     * @return int
+     * 
+     */
+    function getIdProduct($productName, $description, $priceInCHF, $remainingNumber)
+    {
+        static $ps = null;
+        $sql = 'SELECT idProduct FROM PRODUCT WHERE productName = :PRODUCT_NAME AND description = :DESCRIPTION AND priceInCHF = :PRICE_IN_CHF AND remainingNumber = :REMAINING_NUMBER;';
+        if ($ps == null)
+        {
+            $ps = dbConnect()->prepare($sql);
+        }
+        $answer = false;
+        try {
+            $ps->bindParam(':PRODUCT_NAME', $productName, PDO::PARAM_STR);
+            $ps->bindParam(':DESCRIPTION', $description, PDO::PARAM_STR);
+            $ps->bindParam(':PRICE_IN_CHF', $priceInCHF, PDO::PARAM_STR);
+            $ps->bindParam(':REMAINING_NUMBER', $remainingNumber, PDO::PARAM_INT);
+            if ($ps->execute())
+            {
+                $answer = $ps->fetchAll(PDO::FETCH_ASSOC);
+            }
+        } 
+        catch (PDOException $e) {
+            echo $e->getMessage();
+        }
+        return $answer[0]["idProduct"];
+    }
+
+    /**
+     * Function which save the pictures on the server
+     * @param $pictures
+     * @return bool|array
+     * 
+     */
+    function savePictures($pictures)
+    {
+        $picturesNb = count($pictures["name"]);
+        $picturesMoved = 0;
+        for ($i=0; $i < count($pictures["name"]); $i++) 
+        {
+            $pictureMoved = false;
+            $pictureMoved = move_uploaded_file($pictures['tmp_name'][$i], PICTURES_FOLDER . $pictures["name"][$i]);
+            if ($pictureMoved)
+            {
+                $picturesMoved++;
+            }
+        }
+        if ($picturesMoved != $picturesNb)
+        {
+            return false;
+        }
+        else {
+            return $pictures;
+        }
     }
 ?>

@@ -28,7 +28,7 @@
                                 echo "<h5>Identifiez-vous</h5><ul><li><a href=\"" . $dir . "registration.php\">Inscription</a></li><li><a href=\"" . $dir . "login.php\">Connexion</a></li>";
                             }
                             else {
-                                echo "<h5>Bienvenue</h5><ul><li><a href=\"" . $dir . "profil.php\">Profil</a></li><li><a href=\"" . $dir . "profil.php\">Vos commandes</a></li>";
+                                echo "<h5>Bienvenue</h5><ul><li><a href=\"" . $dir . "profil.php\">Profil</a></li><li><a href=\"" . $dir . "orders.php\">Vos commandes</a></li>";
                             }
                         }
                     ?>

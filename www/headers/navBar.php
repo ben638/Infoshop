@@ -23,6 +23,7 @@
                             echo "<li class=\"nav-item\"><a class=\"nav-link\" href=\"" . $dir . "registration.php\">Inscription</a></li>";
                         }
                         else {
+                            echo "<li class=\"nav-item\"><a class=\"nav-link\" href=\"" . $dir . "orders.php\">Commandes</a></li>";
                             echo "<li class=\"nav-item\"><a class=\"nav-link\" href=\"" . $dir . "profil.php\">Profil</a></li>";
                             echo "<li class=\"nav-item\"><a class=\"nav-link\" href=\"" . $dir . "logout.php\">Déconnexion</a></li>";
                         }
