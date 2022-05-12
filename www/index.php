@@ -71,7 +71,7 @@
                         if (isset($_SESSION["isAdmin"]))
                         {
                             echo "<a href=\"" . $dir . "addProduct.php?idProductToUpdate=" . $product["idProduct"] . "\"><button class=\"btn btn-primary\" type=\"button\" style=\"margin-top: 10px;\"><img src=\"assets/img/icons8-modifier.svg\"></button></a>";
-                            echo "<a href=\"" . $dir . "deleteProduct.php?idProductToDele=" . $product["idProduct"] . "\"><button class=\"btn btn-primary\" type=\"button\" style=\"margin-top: 10px;\"><img src=\"assets/img/icons8-poubelle.svg\"></button></a>";
+                            echo "<a href=\"" . $dir . "deleteProduct.php?idProductToDelete=" . $product["idProduct"] . "\"><button class=\"btn btn-primary\" type=\"button\" style=\"margin-top: 10px;\"><img src=\"assets/img/icons8-poubelle.svg\"></button></a>";
                         }
                         echo "</div></div></div>";
                     }

@@ -17,6 +17,10 @@
                 <?php
                     if (isset($dir))
                     {
+                        if (isset($_SESSION["isAdmin"]))
+                        {
+                            echo "<li class=\"nav-item\"><a class=\"nav-link\" href=\"" . $dir . "ordersManagement.php\">Gérer les commandes</a></li>";
+                        }
                         if (!isset($_SESSION["email"]))
                         {
                             echo "<li class=\"nav-item\"><a class=\"nav-link\" href=\"" . $dir . "login.php\">Connexion</a></li>";

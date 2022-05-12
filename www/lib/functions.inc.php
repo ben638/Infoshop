@@ -346,7 +346,7 @@
         catch (PDOException $e) {
             echo $e->getMessage();
         }
-        return $answer;
+        return $answer[0]["idOrder"];
     }
 
     /**
@@ -665,6 +665,28 @@
         return $answer;
     }
 
+    function getClients()
+    {
+        static $ps = null;
+        $sql = 'SELECT * FROM USER;';
+        if ($ps == null)
+        {
+            $ps = dbConnect()->prepare($sql);
+        }
+        $answer = false;
+        try {
+            $ps->bindParam(':EMAIL', $email, PDO::PARAM_STR);
+            if ($ps->execute())
+            {
+                $answer = $ps->fetchAll(PDO::FETCH_ASSOC);
+            }
+        } 
+        catch (PDOException $e) {
+            echo $e->getMessage();
+        }
+        return $answer;
+    }
+
     /**
      * Function which return the order of a user
      * @param $idOrder
@@ -843,13 +865,13 @@
      * @param $othersPictures
      * 
      */
-    function addProductWithPictures($productName, $description, $priceInCHF, $remainingNumber, $hasOthersPictures, $defaultPicture, $othersPictures, $addProduct)
+    function addProductWithPictures($productName, $description, $priceInCHF, $remainingNumber, $hasOthersPictures, $defaultPicture, $othersPictures, $addProduct, $idProduct = 0)
     {
         if ($addProduct)
         {
             addProduct($productName, $description, $priceInCHF, $remainingNumber);
+            $idProduct = getIdProduct($productName, $description, $priceInCHF, $remainingNumber);
         }
-        $idProduct = getIdProduct($productName, $description, $priceInCHF, $remainingNumber);
         addPicture($defaultPicture["name"][0]);
         $idPicture = getIdPicture($defaultPicture["name"][0]);
         linkPictureToProduct($idProduct, $idPicture, true);
@@ -1031,11 +1053,14 @@
 
     function updateProductPictures($idProduct, $productName, $description, $priceInCHF, $remainingNumber, $hasOthersPictures, $defaultPicture, $othersPictures)
     {
-        deleteProductAndPictures($idProduct, false);
-        addProductWithPictures($productName, $description, $priceInCHF, $remainingNumber, $hasOthersPictures, $defaultPicture, $othersPictures, false);
+        addProductWithPictures($productName, $description, $priceInCHF, $remainingNumber, $hasOthersPictures, $defaultPicture, $othersPictures, false, $idProduct);
     }
 
-    
+    function deleteSelectedPicture($idPicture)
+    {
+        deleteLinkPictureToProduct($idPicture);
+        deletePicture($idPicture);
+    }
 
     /*function getIdsPictures($idProduct)
     {

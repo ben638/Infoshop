@@ -10,11 +10,13 @@
     $dir = "./";
     session_start();
     require $dir . "lib/functions.inc.php";
+    // redirect if not admin
     if (!isset($_SESSION["email"]) || !isset($_SESSION["isAdmin"]))
     {
         header("Location: " . $dir . "index.php");
         exit(0);
     }
+    //update or add a product
     if (isset($_POST["productName"]) && isset($_POST["description"]) && isset($_POST["priceInCHF"]) && isset($_POST["quantity"]) && isset($_FILES))
     {
         $productName = htmlspecialchars($_POST["productName"]);
@@ -38,46 +40,38 @@
         }
         else {
             addProductWithPictures($productName, $description, $priceInCHF, $quantity, $hasOthersPictures, $defaultPicture, $othersPictures, true);
-        }
-        
+        }   
     }
-    if (isset($_POST["productName"]) && isset($_POST["description"]) && isset($_POST["priceInCHF"]) && isset($_POST["quantity"]) && isset($_FILES))
+    if (isset($_GET["idPictureToDelete"]))
     {
-        $productName = htmlspecialchars($_POST["productName"]);
-        $description = htmlspecialchars($_POST["description"]);
-        $priceInCHF = htmlspecialchars($_POST["priceInCHF"]);
-        $quantity = htmlspecialchars($_POST["quantity"]);
-        $defaultPicture = $_FILES["defaultPicture"];
-        $defaultPicture = renamePictures($defaultPicture);
-        if (isset($_FILES["othersPictures"]))
-		{
-			if ($_FILES["othersPictures"]["name"][0] != "")
-			{
-				$othersPictures = $_FILES["othersPictures"];
-				$hasOthersPictures = true;
-				$othersPictures = renamePictures($othersPictures);
-			}
-		}
-        addProductWithPictures($productName, $description, $priceInCHF, $quantity, $hasOthersPictures, $defaultPicture, $othersPictures, true);
+        $idProduct = filter_input(INPUT_GET, "idProduct", FILTER_SANITIZE_NUMBER_INT);
+        deleteSelectedPicture(filter_input(INPUT_GET, "idPictureToDelete", FILTER_SANITIZE_NUMBER_INT));
+        header("Location: " . $dir . "addProduct.php?idProductToUpdate=$idProduct");
+        exit(0);
     }
     $updateProduct = false;
+    // show the information of a product if the page will update a product
     if (isset($_GET["idProductToUpdate"]))
     {
         $updateProduct = true;
         $idProduct = filter_input(INPUT_GET, "idProductToUpdate", FILTER_SANITIZE_NUMBER_INT);
         $product = getProduct($idProduct);
         $pictures = getPictures($idProduct);
-        $defaultPicture = $pictures[0];
-        for ($i = 1; $i < count($pictures); $i++)
+        if ($pictures[0]["isDefaultPicture"])
         {
-            $othersPictures[$i-1] = $pictures[$i];
-        }
-        if (isset($defaultPicture))
-        {
+            $defaultPicture = $pictures[0];
             $hasDefaultPicture = true;
+            for ($i = 1; $i < count($pictures); $i++)
+            {
+                $othersPictures[$i-1] = $pictures[$i];
+            }
         }
         else {
             $hasDefaultPicture = false;
+            for ($i = 1; $i < count($pictures); $i++)
+            {
+                $othersPictures[$i-1] = $pictures[$i];
+            }
         }
     }
 ?>
@@ -122,51 +116,41 @@
                     ?>
                 </div>
                 <form method="post" enctype="multipart/form-data" action="addProduct.php" style="max-width: 800px;">
-                    <?php 
-                        /*if ($updateProduct)
-                        {
-                            echo "<div class=\"mb-3\" required><label class=\"form-label\" for=\"name\">Produit à modifier</label><select class=\"form-select\">";
-                            foreach ($products as $product)
-                            {
-                                echo "<option value=\"" . $product["idProduct"] . "\" selected>" . $product["productName"] . "</option>";
-                            }
-                            echo "</select></div>";
-                        }*/
-                    ?>
                     <div class="mb-3"><label class="form-label" for="productName">Nom du produit</label><input class="form-control" type="text" id="productName" name="productName" value="<?php echo $product["productName"]; ?>" required></div>
                     <div class="mb-3"><label class="form-label" for="description">Description</label><textarea class="form-control" id="description" name="description" style="height: 150px;" required><?php echo $product["description"]; ?></textarea></div>
                     <div class="mb-3"><label class="form-label" for="priceInCHF">Prix en CHF</label><input class="form-control" type="number" name="priceInCHF" step="0.01" value="<?php echo $product["priceInCHF"]; ?>" required></div>
                     <div class="mb-3"><label class="form-label" for="quantity">Quantité en stock</label><input class="form-control" type="number" name="quantity" step="1" value="<?php echo $product["remainingNumber"]; ?>" required></div>
-                    <div class="mb-3">
-                        <label class="form-label" for="defaultPicture">Image par défaut</label>
-                        <?php 
-                            if ($hasDefaultPicture)
-                            {
-                                echo "<input class=\"form-control\" type=\"file\" name=\"defaultPicture[]\" accept=\"image/*\">";
-                            }
-                            else {
-                                echo "<input class=\"form-control\" type=\"file\" name=\"defaultPicture[]\" accept=\"image/*\" required>";
-                            }
-                        ?>
-                    </div>
-                    <div class="mb-3">
-                        <?php 
-                            if ($hasDefaultPicture)
-                            {
-                                echo "<img src=\"" . PICTURES_FOLDER . $defaultPicture["fileName"] . "\" style=\"max-width: 400px\">";
-                            }
-                        ?>
-                        <div class="mb-3" style="margin-top: 10px;"><button class="btn btn-primary" type="button"><img src="assets/img/icons8-poubelle.svg"></button></div>
-                    </div>
-                    <div class="mb-3"><label class="form-label" for="othersPictures">Autre(s) image(s)</label><input class="form-control" type="file" name="othersPictures[]" accept="image/*" multiple></div>
-                    <div class="mb-3">
+                    <div>
                         <div class="mb-3">
+                            <label class="form-label" for="defaultPicture">Image par défaut</label>
                             <?php 
-                                foreach ($othersPictures as $picture)
+                                if (!$hasDefaultPicture)
                                 {
-                                    echo "<img src=\"" . PICTURES_FOLDER . $picture["fileName"] . "\" style=\"max-width: 400px\" alt=\"Product picture\"><div class=\"mb-3\" style=\"margin-top: 10px;\"><button class=\"btn btn-primary\" type=\"button\"><img src=\"assets/img/icons8-poubelle.svg\"></button></div>";
+                                    echo "<input class=\"form-control\" type=\"file\" name=\"defaultPicture[]\" accept=\"image/*\" required>";
                                 }
                             ?>
+                        </div>
+                        <div class="mb-3">
+                            <?php 
+                                if ($hasDefaultPicture)
+                                {
+                                    echo "<img src=\"" . PICTURES_FOLDER . $defaultPicture["fileName"] . "\" style=\"max-width: 400px\"><div class=\"mb-3\" style=\"margin-top: 10px;\"><a href=\"addProduct.php?idPictureToDelete=" . $defaultPicture["idPicture"] . "&idProduct=" . $idProduct . "\"><button class=\"btn btn-primary\" type=\"button\"><img src=\"assets/img/icons8-poubelle.svg\"></button></a></div>";
+                                }
+                            ?>
+                        </div>
+                        <div class="mb-3"><label class="form-label" for="othersPictures">Autre(s) image(s)</label><input class="form-control" type="file" name="othersPictures[]" accept="image/*" multiple></div>
+                        <div class="mb-3">
+                            <div class="mb-3">
+                                <?php
+                                    if ($hasDefaultPicture)
+                                    {
+                                        foreach ($othersPictures as $picture)
+                                        {
+                                            echo "<img src=\"" . PICTURES_FOLDER . $picture["fileName"] . "\" style=\"max-width: 400px\"><div class=\"mb-3\" style=\"margin-top: 10px;\"><a href=\"addProduct.php?idPictureToDelete=" . $picture["idPicture"] . "&idProduct=" . $idProduct . "\"><button class=\"btn btn-primary\" type=\"button\"><img src=\"assets/img/icons8-poubelle.svg\"></button></a></div>";
+                                        }
+                                    }
+                                ?>
+                            </div>
                         </div>
                     </div>
                     <div class="mb-3">
