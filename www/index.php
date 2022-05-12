@@ -42,7 +42,13 @@
             <div class="container">
                 <div class="block-heading">
                     <h2 class="text-info">Nos produits en vente</h2>
-                </div><input type="search" style="margin-bottom: 30px;height: 32px;width: 310px;" placeholder="Rechercher par nom ou description"><button class="btn btn-primary" type="button" style="margin-left: 15px;margin-top: -1px;width: 50px;height: 32px;padding-top: 0px;padding-bottom: 0px;"><img src="assets/img/icons8-chercher.svg"></button>
+                </div>
+                <form action="index.php" method="post">
+                    <input type="search" style="margin-bottom: 30px;height: 32px;width: 310px;" placeholder="Rechercher par nom ou description" name="termToSearch">
+                    <button class="btn btn-primary" type="submit" style="margin-left: 15px;margin-top: -1px;width: 50px;height: 32px;padding-top: 0px;padding-bottom: 0px;">
+                        <img src="assets/img/icons8-chercher.svg">
+                    </button>
+                </form>
                 <div class="block-content">
                 <?php
                     if (isset($_SESSION["isAdmin"]))
@@ -65,7 +71,7 @@
                         if (isset($_SESSION["isAdmin"]))
                         {
                             echo "<a href=\"" . $dir . "addProduct.php?idProductToUpdate=" . $product["idProduct"] . "\"><button class=\"btn btn-primary\" type=\"button\" style=\"margin-top: 10px;\"><img src=\"assets/img/icons8-modifier.svg\"></button></a>";
-                            echo "<button class=\"btn btn-primary\" type=\"button\" style=\"margin-top: 10px;\"><img src=\"assets/img/icons8-poubelle.svg\"></button>";
+                            echo "<a href=\"" . $dir . "deleteProduct.php?idProductToDele=" . $product["idProduct"] . "\"><button class=\"btn btn-primary\" type=\"button\" style=\"margin-top: 10px;\"><img src=\"assets/img/icons8-poubelle.svg\"></button></a>";
                         }
                         echo "</div></div></div>";
                     }

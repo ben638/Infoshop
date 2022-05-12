@@ -15,3 +15,9 @@
         header("Location: " . $dir . "index.php");
         exit(0);
     }
+    if (isset($_GET["idProductToDelete"]))
+    {
+        deleteProductAndPictures(htmlspecialchars($_GET["idProductToDelete"]), true);
+    }
+    header("Location: " . $dir . "index.php");
+    exit(0);

@@ -302,6 +302,12 @@
         return $answer;
     }
 
+    function addProductToShoppingBasketInSession($productId, $quantityToAdd)
+    {
+        session_start();
+        $_SESSION['shoppingBasket'][$productId] += $quantityToAdd;
+    }
+
     /*function calculateQuantityOrder($quantityToChange, $idProduct, $hasReduce, $email)
     {
         $remainingNumber = getUserQuantityForProduct($idProduct, getIdOrder($email));
@@ -837,9 +843,12 @@
      * @param $othersPictures
      * 
      */
-    function addProductWithPictures($productName, $description, $priceInCHF, $remainingNumber, $hasOthersPictures, $defaultPicture, $othersPictures)
+    function addProductWithPictures($productName, $description, $priceInCHF, $remainingNumber, $hasOthersPictures, $defaultPicture, $othersPictures, $addProduct)
     {
-        addProduct($productName, $description, $priceInCHF, $remainingNumber);
+        if ($addProduct)
+        {
+            addProduct($productName, $description, $priceInCHF, $remainingNumber);
+        }
         $idProduct = getIdProduct($productName, $description, $priceInCHF, $remainingNumber);
         addPicture($defaultPicture["name"][0]);
         $idPicture = getIdPicture($defaultPicture["name"][0]);
@@ -947,4 +956,106 @@
             return $pictures;
         }
     }
+
+    function deleteProductAndPictures($idProduct, $deleteProduct)
+    {
+        $pictures = getPictures($idProduct);
+        for ($i = 0; $i < count($pictures); $i++)
+        {
+            deleteLinkPictureToProduct($pictures[$i]["idPicture"]);
+            unlink(PICTURES_FOLDER . $pictures[$i]["fileName"]);
+            deletePicture($pictures[$i]["idPicture"]);
+        }
+        if ($deleteProduct)
+        {
+            deleteProduct($idProduct);
+        }
+    }
+
+    function deleteProduct($idProduct)
+    {
+        static $ps = null;
+        $sql = "DELETE FROM PRODUCT WHERE idProduct = :ID_PRODUCT;";
+        if ($ps == null) 
+        {
+            $ps = dbConnect()->prepare($sql);
+        }
+        $answer = false;
+        try {
+            $ps->bindParam(':ID_PRODUCT', $idProduct, PDO::PARAM_INT);
+            $answer = $ps->execute();
+        } 
+        catch (PDOException $e) {
+            echo $e->getMessage();
+        }
+        return $answer;
+    }
+
+    function deleteLinkPictureToProduct($idPicture)
+    {
+        static $ps = null;
+        $sql = "DELETE FROM PICTURE_PRODUCT WHERE idPicture = :ID_PICTURE;";
+        if ($ps == null) 
+        {
+            $ps = dbConnect()->prepare($sql);
+        }
+        $answer = false;
+        try {
+            $ps->bindParam(':ID_PICTURE', $idPicture, PDO::PARAM_INT);
+            $answer = $ps->execute();
+        } 
+        catch (PDOException $e) {
+            echo $e->getMessage();
+        }
+        return $answer;
+    }
+
+    function deletePicture($idPicture)
+    {
+        static $ps = null;
+        $sql = "DELETE FROM PICTURE WHERE idPicture = :ID_PICTURE;";
+        if ($ps == null) 
+        {
+            $ps = dbConnect()->prepare($sql);
+        }
+        $answer = false;
+        try {
+            $ps->bindParam(':ID_PICTURE', $idPicture, PDO::PARAM_INT);
+            $answer = $ps->execute();
+        } 
+        catch (PDOException $e) {
+            echo $e->getMessage();
+        }
+        return $answer;
+    }
+
+    function updateProductPictures($idProduct, $productName, $description, $priceInCHF, $remainingNumber, $hasOthersPictures, $defaultPicture, $othersPictures)
+    {
+        deleteProductAndPictures($idProduct, false);
+        addProductWithPictures($productName, $description, $priceInCHF, $remainingNumber, $hasOthersPictures, $defaultPicture, $othersPictures, false);
+    }
+
+    
+
+    /*function getIdsPictures($idProduct)
+    {
+        static $ps = null;
+        $sql = "SELECT idPicture FROM PICTURE_PRODUCT WHERE idProduct = :ID_PRODUCT;";
+        if ($ps == null) 
+        {
+            $ps = dbConnect()->prepare($sql);
+        }
+        $answer = false;
+        try {
+            $ps->bindParam(':ID_PRODUCT', $idProduct, PDO::PARAM_INT);
+            if ($ps->execute())
+            {
+                $answer = $ps->fetchAll(PDO::FETCH_ASSOC);
+            }
+        } 
+        catch (PDOException $e) {
+            echo $e->getMessage();
+        }
+        return $answer;
+    }*/
 ?>
