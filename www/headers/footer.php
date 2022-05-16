@@ -14,7 +14,7 @@
             <div class="col-sm-3">
                 <h5>Nos produits</h5>
                 <ul>
-                    <li><a href="index.php">Acceuil</a></li>
+                    <li><a href="index.php">Accueil</a></li>
                     <li><a href="index.php">Panier</a></li>
                 </ul>
             </div>
@@ -53,6 +53,6 @@
         </div>
     </div>
     <div class="footer-copyright">
-        <p>© 2022 Copyright Text</p>
+        <p>© 2022 Infoshop</p>
     </div>
 </footer>

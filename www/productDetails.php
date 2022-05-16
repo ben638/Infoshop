@@ -25,11 +25,13 @@
     {
         //check if the user is connected if not do the shopping basket in $_SESSION["shoppingBasket"]
         $quantityToAdd = htmlspecialchars($_POST["quantityToAdd"]);
-        if (!isset($_SESSION["email"]))
+        if (isset($_SESSION["email"]))
         {
+            addProductToShoppingBasket($_SESSION["email"], $productId, $quantityToAdd);
+        }
+        else {
             addProductToShoppingBasketInSession($productId, $quantityToAdd);
         }
-        addProductToShoppingBasket($_SESSION["email"], $productId, $quantityToAdd);
         header("Location: " . $dir . "productDetails.php?productId=" . $productId);
         exit(0);
     }

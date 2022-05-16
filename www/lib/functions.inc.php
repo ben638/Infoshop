@@ -231,6 +231,10 @@
 
     /**
      * Function which add a product in the $_SESSION['shoppingBasket']
+     * @param $idProduct
+     * @param $quantity
+     * @return bool
+     *
      */
     function addProductToShoppingBasketSession($idProduct, $quantity)
     {
@@ -259,6 +263,9 @@
         if (orderExist($email))
         {
             updateRemainingNumber($quantityToChange, $idProduct, true);
+            $totalPrice = getTotalPrice(getIdOrder($email));
+            $totalPrice += $quantityToChange * getProductPrice($idProduct);
+            updateTotalPrice($totalPrice, $_SESSION["email"]);
             if (productOrderedExists($email, $idProduct))
             {
                 $sql = "UPDATE PRODUCT_ORDERED SET quantity = (SELECT quantity FROM PRODUCT_ORDERED WHERE idProduct = :ID_PRODUCT AND idOrder = :ID_ORDER) + :QUANTITY WHERE idProduct = :ID_PRODUCT AND idOrder = :ID_ORDER;";
@@ -302,6 +309,50 @@
         return $answer;
     }
 
+    function getProductPrice($idProduct)
+    {
+        static $ps = null;
+        $sql = 'SELECT priceInCHF FROM PRODUCT WHERE idProduct = :ID_PRODUCT;';
+        if ($ps == null)
+        {
+            $ps = dbConnect()->prepare($sql);
+        }
+        $answer = false;
+        try {
+            $ps->bindParam(':ID_PRODUCT', $idProduct, PDO::PARAM_INT);
+            if ($ps->execute())
+            {
+                $answer = $ps->fetchAll(PDO::FETCH_ASSOC);
+            }
+        }
+        catch (PDOException $e) {
+            echo $e->getMessage();
+        }
+        return $answer[0]["priceInCHF"];
+    }
+
+    function getTotalPrice($idOrder)
+    {
+        static $ps = null;
+        $sql = 'SELECT totalPrice FROM ORDERED WHERE idOrder = :ID_ORDER AND isPaid = 0;';
+        if ($ps == null)
+        {
+            $ps = dbConnect()->prepare($sql);
+        }
+        $answer = false;
+        try {
+            $ps->bindParam(':ID_ORDER', $idOrder, PDO::PARAM_INT);
+            if ($ps->execute())
+            {
+                $answer = $ps->fetchAll(PDO::FETCH_ASSOC);
+            }
+        }
+        catch (PDOException $e) {
+            echo $e->getMessage();
+        }
+        return $answer[0]["totalPrice"];
+    }
+
     function addProductToShoppingBasketInSession($productId, $quantityToAdd)
     {
         session_start();
@@ -330,7 +381,7 @@
     function getIdOrder($email)
     {
         static $ps = null;
-        $sql = 'SELECT idOrder FROM ORDERED WHERE email = :EMAIL;';
+        $sql = 'SELECT idOrder FROM ORDERED WHERE email = :EMAIL AND isPaid = 0;';
         if ($ps == null)
         {
             $ps = dbConnect()->prepare($sql);
@@ -1061,6 +1112,112 @@
         deleteLinkPictureToProduct($idPicture);
         deletePicture($idPicture);
     }
+
+    function getProductDetails($idProduct)
+    {
+        $answer = false;
+        static $ps = null;
+        $sql = 'SELECT PRODUCT.idProduct, productName, description, priceInCHF, remainingNumber, fileName FROM PRODUCT JOIN PICTURE_PRODUCT ON PRODUCT.idProduct = PICTURE_PRODUCT.idProduct JOIN PICTURE ON PICTURE.idPicture = PICTURE_PRODUCT.idPicture WHERE isDefaultPicture = 1 AND PRODUCT.idProduct = :ID_PRODUCT;';
+
+        if ($ps == null)
+        {
+            $ps = dbConnect()->prepare($sql);
+        }
+        
+        try {
+            $ps->bindParam(':ID_PRODUCT', $idProduct, PDO::PARAM_INT);
+            if ($ps->execute())
+            {
+                $answer = $ps->fetchAll(PDO::FETCH_ASSOC);
+            }
+        } 
+        catch (PDOException $e) {
+            echo $e->getMessage();
+        }
+        return $answer[0];
+    }
+
+    function switchPaid($idOrder, $isPaid)
+    {
+        $answer = false;
+        static $ps = null;
+        $sql = 'UPDATE ORDERED SET isPaid = :IS_PAID WHERE idOrder = :ID_ORDER;';
+        if ($ps == null)
+        {
+            $ps = dbConnect()->prepare($sql);
+        }
+        try {
+            $ps->bindParam(':ID_ORDER', $idOrder, PDO::PARAM_INT);
+            $ps->bindParam(':IS_PAID', $isPaid, PDO::PARAM_BOOL);
+            $answer = $ps->execute();
+        } 
+        catch (PDOException $e) {
+            echo $e->getMessage();
+        }
+        return $answer;
+    }
+
+    function switchSent($idOrder, $isSent)
+    {
+        $answer = false;
+        static $ps = null;
+        $sql = 'UPDATE ORDERED SET isSent = :IS_SENT WHERE idOrder = :ID_ORDER;';
+        if ($ps == null)
+        {
+            $ps = dbConnect()->prepare($sql);
+        }
+        try {
+            $ps->bindParam(':ID_ORDER', $idOrder, PDO::PARAM_INT);
+            $ps->bindParam(':IS_SENT', $isSent, PDO::PARAM_BOOL);
+            $answer = $ps->execute();
+        } 
+        catch (PDOException $e) {
+            echo $e->getMessage();
+        }
+        return $answer;
+    }
+
+    function deleteProductFromShoppingBasket($idProduct, $quantity, $idOrder)
+    {
+        static $ps = null;
+        $sql = "DELETE FROM PRODUCT_ORDERED WHERE idProduct = :ID_PRODUCT AND idOrder = :ID_ORDER;";
+        if ($ps == null) 
+        {
+            $ps = dbConnect()->prepare($sql);
+        }
+        $answer = false;
+        try {
+            $ps->bindParam(':ID_PRODUCT', $idProduct, PDO::PARAM_INT);
+            $ps->bindParam(':ID_ORDER', $idOrder, PDO::PARAM_INT);
+            $answer = $ps->execute();
+        } 
+        catch (PDOException $e) {
+            echo $e->getMessage();
+        }
+        return $answer;
+    }
+
+    function updateProductInShoppingBasket($idProduct, $quantity, $idOrder)
+    {
+        static $ps = null;
+        $sql = "UPDATE PRODUCT_ORDERED SET quantity = :QUANTITY WHERE idProduct = :ID_PRODUCT AND idOrder = :ID_ORDER;";
+        if ($ps == null) 
+        {
+            $ps = dbConnect()->prepare($sql);
+        }
+        $answer = false;
+        try {
+            $ps->bindParam(':ID_PRODUCT', $idProduct, PDO::PARAM_INT);
+            $ps->bindParam(':QUANTITY', $quantity, PDO::PARAM_INT);
+            $ps->bindParam(':ID_ORDER', $idOrder, PDO::PARAM_INT);
+            $answer = $ps->execute();
+        } 
+        catch (PDOException $e) {
+            echo $e->getMessage();
+        }
+        return $answer;
+    }
+
 
     /*function getIdsPictures($idProduct)
     {

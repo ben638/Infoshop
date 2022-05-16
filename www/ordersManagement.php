@@ -10,6 +10,28 @@
     $dir = "./";
     session_start();
     require $dir . "lib/functions.inc.php";
+    // redirect if not admin
+    if (!isset($_SESSION["email"]) || !isset($_SESSION["isAdmin"]))
+    {
+        header("Location: " . $dir . "index.php");
+        exit(0);
+    }
+    if (isset($_GET["idProductSwitchToPayed"]))
+    {
+        switchPaid(filter_input(INPUT_GET, "idProductSwitchToPayed", FILTER_SANITIZE_NUMBER_INT), true);
+    }
+    if (isset($_GET["idProductSwitchToNotPayed"]))
+    {
+        switchPaid(filter_input(INPUT_GET, "idProductSwitchToNotPayed", FILTER_SANITIZE_NUMBER_INT), false);
+    }
+    if (isset($_GET["idProductSwitchToSent"]))
+    {
+        switchSent(filter_input(INPUT_GET, "idProductSwitchToSent", FILTER_SANITIZE_NUMBER_INT), true);
+    }
+    if (isset($_GET["idProductSwitchToNotSent"]))
+    {
+        switchSent(filter_input(INPUT_GET, "idProductSwitchToNotSent", FILTER_SANITIZE_NUMBER_INT), false);
+    }
     $clients = getClients();
     foreach ($clients as $client)
     {
@@ -37,12 +59,12 @@
         <section class="clean-block clean-blog-list dark">
             <div class="container">
                 <div class="block-heading">
-                    <h2 class="text-info">Commandes</h2>
+                    <h2 class="text-info">Gestion des commandes</h2>
                 </div>
                 <div class="block-content">
                     <?php
-                        if ($orders)
-                        {
+                        /*if ($orders)
+                        {*/
                             foreach ($ordersByClient as $orders)
                             {
                                 foreach ($orders as $order)
@@ -67,9 +89,23 @@
                                             <div class=\"row\">
                                                 <div class=\"col-lg-7\" style=\"width: 100%;\">
                                                     <h3>Commande n°" . $order["orderInfo"]["idOrder"] . "</h3>
-                                                    <div class=\"info\"><span class=\"text-muted\">$paymentMessage</span></div>
-                                                    <div class=\"info\"><span class=\"text-muted\">$sendMessage</span></div>
-                                                    <p>Prix total : " . $order["orderInfo"]["totalPrice"] . " CHF</p>";
+                                                    <div class=\"info\"><span class=\"text-muted\">$paymentMessage</span>";
+                                    if ($order["orderInfo"]["isPaid"])
+                                    {
+                                        echo "<a href=\"ordersManagement.php?idProductSwitchToNotPayed=" . $order["orderInfo"]["idOrder"] . "\"><button class=\"btn btn-primary\" type=\"submit\">Marquer comme en attente de paiement</button></a>";
+                                    }
+                                    else {
+                                        echo "<a href=\"ordersManagement.php?idProductSwitchToPayed=" . $order["orderInfo"]["idOrder"] . "\"><button class=\"btn btn-primary\" type=\"submit\">Marquer comme payé</button></a>";
+                                    }
+                                    echo "</div>";
+                                    if ($order["orderInfo"]["isSent"])
+                                    {
+                                        echo "<div class=\"info\"><span class=\"text-muted\">$sendMessage</span><a href=\"ordersManagement.php?idProductSwitchToNotSent=" . $order["orderInfo"]["idOrder"] . "\"><button class=\"btn btn-primary\" type=\"submit\">Marquer comme en attente d'envoi</button></a>";
+                                    }
+                                    else {
+                                        echo "<div class=\"info\"><span class=\"text-muted\">$sendMessage</span><a href=\"ordersManagement.php?idProductSwitchToSent=" . $order["orderInfo"]["idOrder"] . "\"><button class=\"btn btn-primary\" type=\"submit\">Marquer comme envoyé</button></a>";
+                                    }
+                                    echo "</div><p>Prix total : " . $order["orderInfo"]["totalPrice"] . " CHF</p>";
                                     foreach ($order["detailOrder"] as $product)
                                     {
                                         echo "<div class=\"product\">
@@ -94,8 +130,7 @@
                                     echo "</div></div></div>";
                                 }
                             }
-                            
-                        }
+                        //}
                     ?>
                 </div>
             </div>

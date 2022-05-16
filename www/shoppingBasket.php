@@ -10,12 +10,26 @@
     $dir = "./";
     session_start();
     require $dir . "lib/functions.inc.php";
-    if (!isset($_SESSION["email"]))
+    if (isset($_POST["idProductToDeleteFromShoppingBasket"]) && isset($_POST["quantity"]))
     {
-        header("Location: " . $dir . "login.php");
-        exit(0);
+        deleteProductFromShoppingBasket(filter_input(INPUT_POST, "idProductToDeleteFromShoppingBasket", FILTER_SANITIZE_NUMBER_INT), filter_input(INPUT_POST, "quantity", FILTER_SANITIZE_NUMBER_INT), getIdOrder($_SESSION["email"]));
     }
-    $products = getShoppingBasket($_SESSION["email"]);
+    if (isset($_POST["idProductToUpdateInShoppingBasket"]) && isset($_POST["quantity"]))
+    {
+        updateProductInShoppingBasket(filter_input(INPUT_POST, "idProductToUpdateInShoppingBasket", FILTER_SANITIZE_NUMBER_INT), filter_input(INPUT_POST, "quantity", FILTER_SANITIZE_NUMBER_INT), getIdOrder($_SESSION["email"]));
+    }
+    if (isset($_SESSION["email"]))
+    {
+        $products = getShoppingBasket($_SESSION["email"]);
+    }
+    else {
+        foreach ($_SESSION["shoppingBasket"] as $idProduct => $quantity)
+        {
+            $products[$idProduct] = getProductDetails($idProduct);
+            $products[$idProduct]["quantity"] = $quantity;
+        }
+    }
+    
 ?>
 <!DOCTYPE html>
 <html>
@@ -29,7 +43,6 @@
     <link rel="stylesheet" href="assets/fonts/simple-line-icons.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/baguettebox.js/1.11.1/baguetteBox.min.css">
     <link rel="stylesheet" href="assets/css/vanilla-zoom.min.css">
-    <link rel="stylesheet" href="css/style.css">
 </head>
 
 <body>
@@ -66,8 +79,8 @@
                                                     <div></div>
                                                 </div>
                                             </div>
-                                            <div class=\"col-6 col-md-2 quantity\"><label class=\"form-label d-none d-md-block\" for=\"quantity\">Quantité</label><input type=\"number\" id=\"number\" class=\"form-control quantity-input\" value=\"" . $product["quantity"] . "\"><button class=\"btn btn-primary\" type=\"button\" style=\"margin-top: 10px;\"><img src=\"assets/img/icons8-modifier.svg\"></button></div>
-                                            <div class=\"col-6 col-md-2 price\"><span id=\"productPrice\">" . $product["priceInCHF"] . " CHF</span><br><button class=\"btn btn-primary\" type=\"button\" style=\"margin-left: 10px;\"><img src=\"assets/img/icons8-poubelle.svg\"></button></div>
+                                            <div class=\"col-6 col-md-2 quantity\"><form method=\"post\" action=\"shoppingBasket.php\"><label class=\"form-label d-none d-md-block\" for=\"quantity\">Quantité</label><input type=\"hidden\" id=\"idProductToUpdateInShoppingBasket\" name=\"idProductToUpdateInShoppingBasket\" value=\"" . $product["idProduct"] . "\"><input type=\"number\" id=\"quantity\" name=\"quantity\" class=\"form-control quantity-input\" value=\"" . $product["quantity"] . "\"><button class=\"btn btn-primary\" type=\"submit\" style=\"margin-top: 10px;\"><img src=\"assets/img/icons8-modifier.svg\"></button></form></div>
+                                            <div class=\"col-6 col-md-2 price\"><form method=\"post\" action=\"shoppingBasket.php\"><span id=\"productPrice\">" . $product["priceInCHF"] . " CHF</span><br><input type=\"hidden\" id=\"idProductToDeleteFromShoppingBasket\" name=\"idProductToDeleteFromShoppingBasket\" value=\"" . $product["idProduct"] . "\"><input type=\"hidden\" id=\"quantity\" name=\"quantity\" value=\"" . $product["quantity"] . "\"><button class=\"btn btn-primary\" type=\"submit\" style=\"margin-left: 10px;\"><img src=\"assets/img/icons8-poubelle.svg\"></button></form></div>
                                         </div>
                                         </div>";
                                     }
