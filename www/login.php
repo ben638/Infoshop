@@ -11,13 +11,13 @@
     session_start();
     if (isset($_SESSION["email"]))
     {
-        header("Location: " . $dir . "profil.php");
+        header("Location: " . $dir . "index.php");
         exit(0);
     }
     if (isset($_POST["email"]) && isset($_POST["password"]))
     {
         require $dir . "lib/functions.inc.php";
-        $email = htmlspecialchars($_POST["email"]);
+        $email = filter_input(INPUT_POST, "email", FILTER_SANITIZE_EMAIL);
         $password = htmlspecialchars($_POST['password']);
         $userInfo = getUserInfo($email);
         if (!$userInfo)
@@ -31,7 +31,7 @@
             {
                 $_SESSION['isAdmin'] = true;
             }
-            header('Location: profil.php');
+            header('Location: index.php');
             exit(0);
         }
     }
@@ -63,7 +63,7 @@
                     <p>Veuillez vous connecter pour faire vos achats</p>
                 </div>
                 <form method="post" action="login.php">
-                    <div class="mb-3"><label class="form-label" for="email">Email</label><input class="form-control item" type="email" id="email" name="email" required></div>
+                    <div class="mb-3"><label class="form-label" for="email">Email</label><input class="form-control item" type="email" id="email" name="email" value="<?php echo $email; ?>" required></div>
                     <div class="mb-3"><label class="form-label" for="password">Mot de passe</label><input class="form-control" type="password" id="password" name="password" required></div>
                     <div class="mb-3"><p>Vous n'avez pas de compte ? <a href="<?php echo $dir; ?>registration.php">Inscrivez-vous ici</a></p></div>
                     <div class="mb-3"><button class="btn btn-primary" type="submit">Connexion</button></div>

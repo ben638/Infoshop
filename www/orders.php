@@ -72,9 +72,12 @@
                                         <div class=\"col-md-5 product-info\"><a class=\"product-name\" href=\"productDetails.php?productId=" . $product["idProduct"] . "\">" . $product["productName"] . "</a>
                                             <div class=\"product-specs\">
                                                 <div></div>
-                                                <div>
-                                                    <p>" . $product["description"] . "</p>
-                                                </div>
+                                                <div><p>";
+                                for ($i = 0; $i < CHARS_NB; $i++)
+                                {
+                                    echo $product["description"][$i];
+                                }
+                                echo "</p></div>
                                                 <div></div>
                                             </div>
                                         </div>

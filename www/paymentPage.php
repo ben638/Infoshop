@@ -57,7 +57,7 @@
                         <div class="item"><span class="price"><?php echo $shoppingBasket["idOrder"]; ?></span>
                             <p class="item-name">Commande N°</p>
                         </div>
-                        <div class="total"><span>Total</span><span class="price"><?php echo $shoppingBasket["totalPrice"]; ?> CHF</span></div><button class="btn btn-primary" type="button" style="margin-top: 20px;">Continuer mes achats</button><button class="btn btn-primary" type="button" style="margin-top: 20px;margin-left: 20px;">J'ai payé</button>
+                        <div class="total"><span>Total</span><span class="price"><?php echo $shoppingBasket["totalPrice"]; ?> CHF</span></div>
                     </div>
                 </form>
             </div>

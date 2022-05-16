@@ -12,11 +12,27 @@
     require $dir . "lib/functions.inc.php";
     if (isset($_POST["idProductToDeleteFromShoppingBasket"]) && isset($_POST["quantity"]))
     {
-        deleteProductFromShoppingBasket(filter_input(INPUT_POST, "idProductToDeleteFromShoppingBasket", FILTER_SANITIZE_NUMBER_INT), filter_input(INPUT_POST, "quantity", FILTER_SANITIZE_NUMBER_INT), getIdOrder($_SESSION["email"]));
+        $idProduct = filter_input(INPUT_POST, "idProductToDeleteFromShoppingBasket", FILTER_SANITIZE_NUMBER_INT);
+        $quantity = filter_input(INPUT_POST, "quantity", FILTER_SANITIZE_NUMBER_INT);
+        if (isset($_SESSION["email"]))
+        {
+            deleteProductFromShoppingBasket($idProduct, $quantity, getIdOrder($_SESSION["email"]));
+        }
+        else {
+            unset($_SESSION["shoppingBasket"][$idProduct]);
+        }
     }
     if (isset($_POST["idProductToUpdateInShoppingBasket"]) && isset($_POST["quantity"]))
     {
-        updateProductInShoppingBasket(filter_input(INPUT_POST, "idProductToUpdateInShoppingBasket", FILTER_SANITIZE_NUMBER_INT), filter_input(INPUT_POST, "quantity", FILTER_SANITIZE_NUMBER_INT), getIdOrder($_SESSION["email"]));
+        $idProduct = filter_input(INPUT_POST, "idProductToUpdateInShoppingBasket", FILTER_SANITIZE_NUMBER_INT);
+        $quantity = filter_input(INPUT_POST, "quantity", FILTER_SANITIZE_NUMBER_INT);
+        if (isset($_SESSION["email"]))
+        {
+            updateProductInShoppingBasket($idProduct, $quantity, getIdOrder($_SESSION["email"]));
+        }
+        else {
+            $_SESSION["shoppingBasket"][$idProduct] = $quantity;
+        }
     }
     if (isset($_SESSION["email"]))
     {

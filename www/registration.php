@@ -17,29 +17,36 @@
     if (isset($_POST["email"]) && isset($_POST["password"]) && isset($_POST["passwordConfirm"]) && isset($_POST["streetName"]) && isset($_POST["streetNumber"]) && isset($_POST["postalCode"]) && isset($_POST["city"]))
     {
         require $dir . "lib/functions.inc.php";
-        $email = htmlspecialchars($_POST["email"]);
-        $passwordHash = password_hash(htmlspecialchars($_POST['password']), PASSWORD_DEFAULT);
-        $passwordConfirm = htmlspecialchars($_POST['passwordConfirm']);
-        $streetName = htmlspecialchars($_POST["streetName"]);
-        $streetNumber = htmlspecialchars($_POST["streetNumber"]);
-        $postalCode = htmlspecialchars($_POST["postalCode"]);
-        $city = htmlspecialchars($_POST["city"]);
-        $success = false;
-        if (password_verify($passwordConfirm, $passwordHash))
+        $email = filter_input(INPUT_POST, "email", FILTER_VALIDATE_EMAIL);
+        if ($email)
         {
-            $success = createUser($email, $passwordHash, $streetName, $streetNumber, $postalCode, $city);
+            $passwordHash = password_hash(htmlspecialchars($_POST['password']), PASSWORD_DEFAULT);
+            $passwordConfirm = htmlspecialchars($_POST['passwordConfirm']);
+            $streetName = htmlspecialchars($_POST["streetName"]);
+            $streetNumber = filter_input(INPUT_POST, "streetNumber", FILTER_SANITIZE_NUMBER_INT);
+            $postalCode = filter_input(INPUT_POST, "postalCode", FILTER_SANITIZE_NUMBER_INT);
+            $city = htmlspecialchars($_POST["city"]);
+            $success = false;
+            if (password_verify($passwordConfirm, $passwordHash))
+            {
+                $success = createUser($email, $passwordHash, $streetName, $streetNumber, $postalCode, $city);
+                if ($success)
+                {
+                    header("Location: " . $dir . "login.php");
+                    exit(0);
+                }
+                else {
+                    $emailErrorMessage = "L'email est déjà utilisé";
+                }
+            }
+            else
+            {
+                $passwordMessageError = "Les mots de passe ne correspondent pas";
+            }
         }
         else
         {
-            $passwordMessageError = "Les mots de passe ne correspondent pas";
-        }
-        if ($success)
-        {
-            header("Location: " . $dir . "login.php");
-            exit(0);
-        }
-        else {
-            $emailErrorMessage = "L'email est déjà utilisé";
+            $emailErrorMessage = "L'email n'est pas valide";
         }
     }
 ?>
@@ -69,17 +76,17 @@
                     <p>Nouveau visiteur ? Inscrivez-vous !</p>
                 </div>
                 <form method="post" action="registration.php">
-                    <div class="mb-3"><label class="form-label" for="email">Email</label><input class="form-control item" type="email" id="email" name="email" required></div>
+                    <div class="mb-3"><label class="form-label" for="email">Email</label><input class="form-control item" type="email" id="email" name="email" value="<?php echo $email; ?>" required></div>
                     <div class="mb-3"><p><?php echo $emailErrorMessage ?></p></div>
                     <div class="mb-3"><label class="form-label" for="password">Mot de passe</label><input class="form-control item" type="password" id="password" name="password" required></div>
                     <div class="mb-3"><label class="form-label" for="passwordConfirm">Ré-entrer votre mot de passe</label><input class="form-control item" type="password" id="passwordConfirm" name="passwordConfirm" required></div>
                     <div class="mb-3"><p><?php echo $passwordMessageError ?></p></div>
                     <fieldset>
                         <legend>Adresse</legend>
-                        <div class="mb-3"><label class="form-label" for="email">Rue</label><input class="form-control item" type="text" id="streetName" name="streetName" required>
-                            <div class="mb-3"><label class="form-label" for="email">N°</label><input class="form-control item" type="text" id="streetNumber" name="streetNumber" required></div>
+                        <div class="mb-3"><label class="form-label" for="email">Rue</label><input class="form-control item" type="text" id="streetName" name="streetName" value="<?php echo $streetName; ?>" required>
+                            <div class="mb-3"><label class="form-label" for="email">N°</label><input class="form-control item" type="text" id="streetNumber" name="streetNumber" value="<?php echo $streetNumber; ?>" required></div>
                         </div>
-                        <div class="mb-3"><label class="form-label" for="email">Code postal</label><input class="form-control item" type="text" id="postalCode" name="postalCode" required></div>
+                        <div class="mb-3"><label class="form-label" for="email">Code postal</label><input class="form-control item" type="text" id="postalCode" name="postalCode" value="<?php echo $postalCode; ?>" required></div>
                         <div class="mb-3"><label class="form-label" for="email">Ville</label><input class="form-control item" type="text" id="city" name="city" required></div>
                     </fieldset><button class="btn btn-primary" type="submit">S'inscrire</button>
                 </form>

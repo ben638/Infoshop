@@ -123,7 +123,7 @@
     function getAllProducts()
     {
         static $ps = null;
-        $sql = 'SELECT * FROM PRODUCT JOIN PICTURE_PRODUCT ON PRODUCT.idProduct = PICTURE_PRODUCT.idProduct JOIN PICTURE ON PICTURE.idPicture = PICTURE_PRODUCT.idPicture WHERE isDefaultPicture = 1;';
+        $sql = 'SELECT * FROM PRODUCT JOIN PICTURE_PRODUCT ON PRODUCT.idProduct = PICTURE_PRODUCT.idProduct JOIN PICTURE ON PICTURE.idPicture = PICTURE_PRODUCT.idPicture WHERE isDefaultPicture = 1 ORDER BY productName ASC;';
 
         if ($ps == null)
         {
@@ -209,7 +209,7 @@
     function searchProducts($termToSearch)
     {
         static $ps = null;
-        $sql = 'SELECT * FROM PRODUCT JOIN PICTURE_PRODUCT ON PRODUCT.idProduct = PICTURE_PRODUCT.idProduct JOIN PICTURE ON PICTURE.idPicture = PICTURE_PRODUCT.idPicture WHERE isDefaultPicture = 1 AND (productName LIKE :TERM_TO_SEARCH OR description LIKE :TERM_TO_SEARCH);';
+        $sql = 'SELECT * FROM PRODUCT JOIN PICTURE_PRODUCT ON PRODUCT.idProduct = PICTURE_PRODUCT.idProduct JOIN PICTURE ON PICTURE.idPicture = PICTURE_PRODUCT.idPicture WHERE isDefaultPicture = 1 AND (productName LIKE :TERM_TO_SEARCH OR description LIKE :TERM_TO_SEARCH) ORDER BY PRODUCT.productName ASC;';
         $termToSearch = "%" . $termToSearch . "%";
         if ($ps == null)
         {
@@ -309,6 +309,12 @@
         return $answer;
     }
 
+    /**
+     * Function which return the price in CHF of a product
+     * @param $idProduct
+     * @return bool|array
+     * 
+     */
     function getProductPrice($idProduct)
     {
         static $ps = null;
@@ -331,6 +337,12 @@
         return $answer[0]["priceInCHF"];
     }
 
+    /**
+     * Function which return the total price of the order
+     * @param $idOrder
+     * @return bool|array
+     * 
+     */
     function getTotalPrice($idOrder)
     {
         static $ps = null;
@@ -353,24 +365,17 @@
         return $answer[0]["totalPrice"];
     }
 
+    /**
+     * Function which add a product for a user which is not connected
+     * @param $productId
+     * @param $quantityToAdd
+     * 
+     */
     function addProductToShoppingBasketInSession($productId, $quantityToAdd)
     {
         session_start();
         $_SESSION['shoppingBasket'][$productId] += $quantityToAdd;
     }
-
-    /*function calculateQuantityOrder($quantityToChange, $idProduct, $hasReduce, $email)
-    {
-        $remainingNumber = getUserQuantityForProduct($idProduct, getIdOrder($email));
-        if ($hasReduce)
-        {
-            $remainingNumber -= $quantityToChange;
-        }
-        else {
-            $remainingNumber += $quantityToChange;
-        }
-        //updateQuantity($idProduct, $remainingNumber);
-    }*/
 
     /**
      * Function which return the id of the "active" order of a user
@@ -402,6 +407,8 @@
 
     /**
      * Function which return the products which are in the shopping basket
+     * @param $idProduct
+     * @param $idOrder
      * @return bool|array
      * 
      */
@@ -660,7 +667,7 @@
         if (!checkUserExists($newEmail) || $oldEmail == $newEmail)
         {
             static $ps = null;
-            $sql = "UPDATE USER SET email = :NEW_EMAIL, passwordHash = :PASSWORD_HASH, isAdmin = 0, streetName = :STREET_NAME, streetNumber = :STREET_NUMBER, city = :CITY, postalCode = :POSTAL_CODE WHERE email = :OLD_EMAIL;";
+            $sql = "UPDATE USER SET email = :NEW_EMAIL, passwordHash = :PASSWORD_HASH, streetName = :STREET_NAME, streetNumber = :STREET_NUMBER, city = :CITY, postalCode = :POSTAL_CODE WHERE email = :OLD_EMAIL;";
             if ($ps == null) 
             {
                 $ps = dbConnect()->prepare($sql);
@@ -716,6 +723,11 @@
         return $answer;
     }
 
+    /**
+     * Function which return all the users in the database
+     * @return bool|array
+     * 
+     */
     function getClients()
     {
         static $ps = null;
@@ -1030,6 +1042,12 @@
         }
     }
 
+    /**
+     * Function which delete a product and its associated pictures from the database and the server
+     * @param $idProduct
+     * @param $deleteProduct
+     * 
+     */
     function deleteProductAndPictures($idProduct, $deleteProduct)
     {
         $pictures = getPictures($idProduct);
@@ -1045,6 +1063,12 @@
         }
     }
 
+    /**
+     * Function which delete a product from the database
+     * @param $idProduct
+     * @return bool|array
+     * 
+     */
     function deleteProduct($idProduct)
     {
         static $ps = null;
@@ -1064,6 +1088,11 @@
         return $answer;
     }
 
+    /**
+     * Function which delete the link in the database between the product and the picture
+     * @param $idPicture
+     * @return bool|array
+     */
     function deleteLinkPictureToProduct($idPicture)
     {
         static $ps = null;
@@ -1083,6 +1112,12 @@
         return $answer;
     }
 
+    /**
+     * Function which delete a picture from the database
+     * @param $idPicture
+     * @return bool|array
+     * 
+     */
     function deletePicture($idPicture)
     {
         static $ps = null;
@@ -1102,17 +1137,41 @@
         return $answer;
     }
 
+    /**
+     * Function which update the product and its pictures using the fonction to add a product
+     * @param $idProduct
+     * @param $productName
+     * @param $description
+     * @param $priceInCHF
+     * @param $remainingNumber
+     * @param $hasOthersPictures
+     * @param $defaultPicture
+     * @param $othersPictures
+     * 
+     */
     function updateProductPictures($idProduct, $productName, $description, $priceInCHF, $remainingNumber, $hasOthersPictures, $defaultPicture, $othersPictures)
     {
         addProductWithPictures($productName, $description, $priceInCHF, $remainingNumber, $hasOthersPictures, $defaultPicture, $othersPictures, false, $idProduct);
     }
 
+    /**
+     * Function which delete a picture
+     * @param $idPicture
+     * 
+     */
     function deleteSelectedPicture($idPicture)
     {
         deleteLinkPictureToProduct($idPicture);
         deletePicture($idPicture);
     }
 
+
+    /**
+     * Function which return product's information
+     * @param $idProduct
+     * @return bool|array
+     * 
+     */
     function getProductDetails($idProduct)
     {
         $answer = false;

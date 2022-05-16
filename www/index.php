@@ -63,7 +63,7 @@
                                     <div class=\"col-lg-7\">
                                         <h3><a href=\"" . $dir . "productDetails.php?productId=" . $product["idProduct"] . "\">" . $product["productName"] . "</a></h3>
                                         <p>";
-                        for ($i = 0; $i < 150; $i++)
+                        for ($i = 0; $i < CHARS_NB; $i++)
                         {
                             echo $product["description"][$i];
                         }
