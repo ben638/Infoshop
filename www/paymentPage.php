@@ -12,7 +12,7 @@
     require $dir . "lib/functions.inc.php";
     if (!isset($_SESSION["email"]))
     {
-        header("Location: " . $dir . "index.php");
+        header("Location: " . $dir . "login.php");
         exit(0);
     }
     if (!isset($_POST["goToPaymentPage"]))
@@ -21,6 +21,7 @@
         exit(0);
     }
     $shoppingBasket = orderExist($_SESSION["email"])[0];
+    switchPaid($shoppingBasket["idOrder"], true);
 ?>
 <!DOCTYPE html>
 <html>

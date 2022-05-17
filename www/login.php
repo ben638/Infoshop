@@ -65,6 +65,7 @@
                 <form method="post" action="login.php">
                     <div class="mb-3"><label class="form-label" for="email">Email</label><input class="form-control item" type="email" id="email" name="email" value="<?php echo $email; ?>" required></div>
                     <div class="mb-3"><label class="form-label" for="password">Mot de passe</label><input class="form-control" type="password" id="password" name="password" required></div>
+                    <div class="mb-3"><p><?php echo $accountErrorMessage ?></p></div>
                     <div class="mb-3"><p>Vous n'avez pas de compte ? <a href="<?php echo $dir; ?>registration.php">Inscrivez-vous ici</a></p></div>
                     <div class="mb-3"><button class="btn btn-primary" type="submit">Connexion</button></div>
                 </form>

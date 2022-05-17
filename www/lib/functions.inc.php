@@ -371,10 +371,11 @@
      * @param $quantityToAdd
      * 
      */
-    function addProductToShoppingBasketInSession($productId, $quantityToAdd)
+    function addProductToShoppingBasketInSession($idProduct, $quantityToAdd)
     {
         session_start();
-        $_SESSION['shoppingBasket'][$productId] += $quantityToAdd;
+        updateRemainingNumber($quantityToAdd, $idProduct, true);
+        $_SESSION['shoppingBasket'][$idProduct] += $quantityToAdd;
     }
 
     /**
@@ -930,25 +931,34 @@
      */
     function addProductWithPictures($productName, $description, $priceInCHF, $remainingNumber, $hasOthersPictures, $defaultPicture, $othersPictures, $addProduct, $idProduct = 0)
     {
-        if ($addProduct)
-        {
-            addProduct($productName, $description, $priceInCHF, $remainingNumber);
-            $idProduct = getIdProduct($productName, $description, $priceInCHF, $remainingNumber);
-        }
-        addPicture($defaultPicture["name"][0]);
-        $idPicture = getIdPicture($defaultPicture["name"][0]);
-        linkPictureToProduct($idProduct, $idPicture, true);
-        if ($hasOthersPictures)
-        {
-            for ($i=0; $i < count($othersPictures["name"]); $i++) 
+        try {
+            if ($addProduct)
             {
-                addPicture($othersPictures["name"][$i]);
-                $idPicture = getIdPicture($othersPictures["name"][$i]);
-                linkPictureToProduct($idProduct, $idPicture, false);
+                addProduct($productName, $description, $priceInCHF, $remainingNumber);
+                $idProduct = getIdProduct($productName, $description, $priceInCHF, $remainingNumber);
             }
+            if (isset($defaultPicture["name"][0]))
+            {
+                addPicture($defaultPicture["name"][0]);
+                $idPicture = getIdPicture($defaultPicture["name"][0]);
+                linkPictureToProduct($idProduct, $idPicture, true);
+            }
+            if ($hasOthersPictures)
+            {
+                for ($i=0; $i < count($othersPictures["name"]); $i++) 
+                {
+                    addPicture($othersPictures["name"][$i]);
+                    $idPicture = getIdPicture($othersPictures["name"][$i]);
+                    linkPictureToProduct($idProduct, $idPicture, false);
+                }
+            }
+            savePictures($defaultPicture);
+            savePictures($othersPictures);
+        } 
+        catch (Exception $e) {
+            return false;
         }
-        savePictures($defaultPicture);
-        savePictures($othersPictures);
+        return true;
     }
 
     /**
@@ -1151,7 +1161,37 @@
      */
     function updateProductPictures($idProduct, $productName, $description, $priceInCHF, $remainingNumber, $hasOthersPictures, $defaultPicture, $othersPictures)
     {
-        addProductWithPictures($productName, $description, $priceInCHF, $remainingNumber, $hasOthersPictures, $defaultPicture, $othersPictures, false, $idProduct);
+        try {
+            updateProductInfos($idProduct, $productName, $description, $priceInCHF, $remainingNumber);
+            addProductWithPictures($productName, $description, $priceInCHF, $remainingNumber, $hasOthersPictures, $defaultPicture, $othersPictures, false, $idProduct);
+        }
+        catch (Exception $e) {
+            return false;
+        }
+        return true;
+    }
+
+    function updateProductInfos($idProduct, $productName, $description, $priceInCHF, $remainingNumber)
+    {
+        $answer = false;
+        static $ps = null;
+        $sql = 'UPDATE PRODUCT SET productName = :PRODUCT_NAME, description = :DESCRIPTION, priceInCHF = :PRICE_IN_CHF, remainingNumber = :REMAINING_NUMBER WHERE idProduct = :ID_PRODUCT;';
+        if ($ps == null)
+        {
+            $ps = dbConnect()->prepare($sql);
+        }
+        try {
+            $ps->bindParam(':PRODUCT_NAME', $productName, PDO::PARAM_STR);
+            $ps->bindParam(':DESCRIPTION', $description, PDO::PARAM_STR);
+            $ps->bindParam(':PRICE_IN_CHF', $priceInCHF, PDO::PARAM_STR);
+            $ps->bindParam(':REMAINING_NUMBER', $remainingNumber, PDO::PARAM_INT);
+            $ps->bindParam(':ID_PRODUCT', $idProduct, PDO::PARAM_INT);
+            $answer = $ps->execute();
+        } 
+        catch (PDOException $e) {
+            echo $e->getMessage();
+        }
+        return $answer;
     }
 
     /**

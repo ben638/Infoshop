@@ -63,74 +63,71 @@
                 </div>
                 <div class="block-content">
                     <?php
-                        /*if ($orders)
-                        {*/
-                            foreach ($ordersByClient as $orders)
+                        foreach ($ordersByClient as $orders)
+                        {
+                            foreach ($orders as $order)
                             {
-                                foreach ($orders as $order)
+                                $paymentMessage = "";
+                                $sendMessage = "";
+                                if ($order["orderInfo"]["isPaid"])
                                 {
-                                    $paymentMessage = "";
-                                    $sendMessage = "";
-                                    if ($order["orderInfo"]["isPaid"])
-                                    {
-                                        $paymentMessage = "Payé";
-                                    }
-                                    else {
-                                        $paymentMessage = "En attente de paiement";
-                                    }
-                                    if ($order["orderInfo"]["isSent"])
-                                    {
-                                        $sendMessage = "Envoyé";
-                                    }
-                                    else {
-                                        $sendMessage = "En attente d'envoi";
-                                    }
-                                    echo "<div class=\"clean-blog-post\">
-                                            <div class=\"row\">
-                                                <div class=\"col-lg-7\" style=\"width: 100%;\">
-                                                    <h3>Commande n°" . $order["orderInfo"]["idOrder"] . "</h3>
-                                                    <div class=\"info\"><span class=\"text-muted\">$paymentMessage</span>";
-                                    if ($order["orderInfo"]["isPaid"])
-                                    {
-                                        echo "<a href=\"ordersManagement.php?idProductSwitchToNotPayed=" . $order["orderInfo"]["idOrder"] . "\"><button class=\"btn btn-primary\" type=\"submit\">Marquer comme en attente de paiement</button></a>";
-                                    }
-                                    else {
-                                        echo "<a href=\"ordersManagement.php?idProductSwitchToPayed=" . $order["orderInfo"]["idOrder"] . "\"><button class=\"btn btn-primary\" type=\"submit\">Marquer comme payé</button></a>";
-                                    }
-                                    echo "</div>";
-                                    if ($order["orderInfo"]["isSent"])
-                                    {
-                                        echo "<div class=\"info\"><span class=\"text-muted\">$sendMessage</span><a href=\"ordersManagement.php?idProductSwitchToNotSent=" . $order["orderInfo"]["idOrder"] . "\"><button class=\"btn btn-primary\" type=\"submit\">Marquer comme en attente d'envoi</button></a>";
-                                    }
-                                    else {
-                                        echo "<div class=\"info\"><span class=\"text-muted\">$sendMessage</span><a href=\"ordersManagement.php?idProductSwitchToSent=" . $order["orderInfo"]["idOrder"] . "\"><button class=\"btn btn-primary\" type=\"submit\">Marquer comme envoyé</button></a>";
-                                    }
-                                    echo "</div><p>Prix total : " . $order["orderInfo"]["totalPrice"] . " CHF</p>";
-                                    foreach ($order["detailOrder"] as $product)
-                                    {
-                                        echo "<div class=\"product\">
-                                            <div class=\"row justify-content-center align-items-center\">
-                                                <div class=\"col-md-3\">
-                                                    <div class=\"product-image\"><img class=\"img-fluid d-block mx-auto image\" src=\"" . PICTURES_FOLDER . $product["fileName"] . "\"></div>
-                                                </div>
-                                                <div class=\"col-md-5 product-info\"><a class=\"product-name\" href=\"productDetails.php?productId=" . $product["idProduct"] . "\">" . $product["productName"] . "</a>
-                                                    <div class=\"product-specs\">
-                                                        <div></div>
-                                                        <div>
-                                                            <p>" . $product["description"] . "</p>
-                                                        </div>
-                                                        <div></div>
-                                                    </div>
-                                                </div>
-                                                <div class=\"col-6 col-md-2 quantity\"><label class=\"form-label d-none d-md-block\" for=\"quantity\">Quantité</label><input type=\"number\" id=\"number\" class=\"form-control quantity-input\" value=\"" . $product["quantity"] . "\"></div>
-                                                <div class=\"col-6 col-md-2 price\"><label class=\"form-label d-none d-md-block\" for=\"quantity\">Prix à l'unité</label><p class=\"form-control quantity-input\">" . $product["priceInCHF"] . " CHF</p></div>
-                                            </div>
-                                            </div>";
-                                    }
-                                    echo "</div></div></div>";
+                                    $paymentMessage = "Payé";
                                 }
+                                else {
+                                    $paymentMessage = "En attente de paiement";
+                                }
+                                if ($order["orderInfo"]["isSent"])
+                                {
+                                    $sendMessage = "Envoyé";
+                                }
+                                else {
+                                    $sendMessage = "En attente d'envoi";
+                                }
+                                echo "<div class=\"clean-blog-post\">
+                                        <div class=\"row\">
+                                            <div class=\"col-lg-7\" style=\"width: 100%;\">
+                                                <h3>Commande n°" . $order["orderInfo"]["idOrder"] . "</h3>
+                                                <div class=\"info\"><span class=\"text-muted\">$paymentMessage</span>";
+                                if ($order["orderInfo"]["isPaid"])
+                                {
+                                    echo "<a href=\"ordersManagement.php?idProductSwitchToNotPayed=" . $order["orderInfo"]["idOrder"] . "\"><button class=\"btn btn-primary\" type=\"submit\">Marquer comme en attente de paiement</button></a>";
+                                }
+                                else {
+                                    echo "<a href=\"ordersManagement.php?idProductSwitchToPayed=" . $order["orderInfo"]["idOrder"] . "\"><button class=\"btn btn-primary\" type=\"submit\">Marquer comme payé</button></a>";
+                                }
+                                echo "</div>";
+                                if ($order["orderInfo"]["isSent"])
+                                {
+                                    echo "<div class=\"info\"><span class=\"text-muted\">$sendMessage</span><a href=\"ordersManagement.php?idProductSwitchToNotSent=" . $order["orderInfo"]["idOrder"] . "\"><button class=\"btn btn-primary\" type=\"submit\">Marquer comme en attente d'envoi</button></a>";
+                                }
+                                else {
+                                    echo "<div class=\"info\"><span class=\"text-muted\">$sendMessage</span><a href=\"ordersManagement.php?idProductSwitchToSent=" . $order["orderInfo"]["idOrder"] . "\"><button class=\"btn btn-primary\" type=\"submit\">Marquer comme envoyé</button></a>";
+                                }
+                                echo "</div><p>Prix total : " . $order["orderInfo"]["totalPrice"] . " CHF</p>";
+                                foreach ($order["detailOrder"] as $product)
+                                {
+                                    echo "<div class=\"product\">
+                                        <div class=\"row justify-content-center align-items-center\">
+                                            <div class=\"col-md-3\">
+                                                <div class=\"product-image\"><img class=\"img-fluid d-block mx-auto image\" src=\"" . PICTURES_FOLDER . $product["fileName"] . "\"></div>
+                                            </div>
+                                            <div class=\"col-md-5 product-info\"><a class=\"product-name\" href=\"productDetails.php?productId=" . $product["idProduct"] . "\">" . $product["productName"] . "</a>
+                                                <div class=\"product-specs\">
+                                                    <div></div>
+                                                    <div>
+                                                        <p>" . $product["description"] . "</p>
+                                                    </div>
+                                                    <div></div>
+                                                </div>
+                                            </div>
+                                            <div class=\"col-6 col-md-2 quantity\"><label class=\"form-label d-none d-md-block\" for=\"quantity\">Quantité</label><span>" . $product["quantity"] . "</span></div>
+                                            <div class=\"col-6 col-md-2 price\"><label class=\"form-label d-none d-md-block\" for=\"quantity\">Prix à l'unité</label><span>" . $product["priceInCHF"] . " CHF</span></div>
+                                        </div>
+                                        </div>";
+                                }
+                                echo "</div></div></div>";
                             }
-                        //}
+                        }
                     ?>
                 </div>
             </div>

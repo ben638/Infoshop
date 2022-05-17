@@ -10,6 +10,7 @@
     $dir = "./";
     session_start();
     require $dir . "lib/functions.inc.php";
+    $updateProduct = false;
     // redirect if not admin
     if (!isset($_SESSION["email"]) || !isset($_SESSION["isAdmin"]))
     {
@@ -21,8 +22,8 @@
     {
         $productName = htmlspecialchars($_POST["productName"]);
         $description = htmlspecialchars($_POST["description"]);
-        $priceInCHF = htmlspecialchars($_POST["priceInCHF"]);
-        $quantity = htmlspecialchars($_POST["quantity"]);
+        $priceInCHF = filter_input(INPUT_POST, "priceInCHF", FILTER_SANITIZE_NUMBER_FLOAT);
+        $quantity = filter_input(INPUT_POST, "quantity", FILTER_SANITIZE_NUMBER_INT);
         $defaultPicture = $_FILES["defaultPicture"];
         $defaultPicture = renamePictures($defaultPicture);
         if (isset($_FILES["othersPictures"]))
@@ -34,13 +35,17 @@
 				$othersPictures = renamePictures($othersPictures);
 			}
 		}
-        if (isset($_GET["idProductToUpdate"]))
+        if (isset($_POST["idProductToUpdate"]))
         {
-            updateProductPictures(filter_input(INPUT_GET, "idProductToUpdate", FILTER_SANITIZE_NUMBER_INT), $productName, $description, $priceInCHF, $quantity, $hasOthersPictures, $defaultPicture, $othersPictures);
+            $idProductToUpdate = filter_input(INPUT_POST, "idProductToUpdate", FILTER_SANITIZE_NUMBER_INT);
+            $success = updateProductPictures($idProductToUpdate, $productName, $description, $priceInCHF, $quantity, $hasOthersPictures, $defaultPicture, $othersPictures);
+            echo "";
+            header("Location: " . $dir . "addProduct.php?idProductToUpdate=$idProductToUpdate&success=$success");
+            exit(0);
         }
         else {
-            addProductWithPictures($productName, $description, $priceInCHF, $quantity, $hasOthersPictures, $defaultPicture, $othersPictures, true);
-        }   
+            $success = addProductWithPictures($productName, $description, $priceInCHF, $quantity, $hasOthersPictures, $defaultPicture, $othersPictures, true);
+        }
     }
     if (isset($_GET["idPictureToDelete"]))
     {
@@ -49,11 +54,15 @@
         header("Location: " . $dir . "addProduct.php?idProductToUpdate=$idProduct");
         exit(0);
     }
-    $updateProduct = false;
+    
     // show the information of a product if the page will update a product
     if (isset($_GET["idProductToUpdate"]))
     {
         $updateProduct = true;
+        if (isset($_GET["success"]))
+        {
+            $success = htmlspecialchars($_GET["success"]);
+        }
         $idProduct = filter_input(INPUT_GET, "idProductToUpdate", FILTER_SANITIZE_NUMBER_INT);
         $product = getProduct($idProduct);
         $pictures = getPictures($idProduct);
@@ -68,9 +77,9 @@
         }
         else {
             $hasDefaultPicture = false;
-            for ($i = 1; $i < count($pictures); $i++)
+            for ($i = 1; $i <= count($pictures); $i++)
             {
-                $othersPictures[$i-1] = $pictures[$i];
+                $othersPictures[$i-1] = $pictures[$i-1];
             }
         }
     }
@@ -116,6 +125,28 @@
                     ?>
                 </div>
                 <form method="post" enctype="multipart/form-data" action="addProduct.php" style="max-width: 800px;">
+                    <?php 
+                        if ($success && $updateProduct)
+                        {
+                            echo "<div class=\"mb-3\"><p>Le produit a bien été modifié</p></div>";
+                        }
+                        else if ($success && !$updateProduct)
+                        {
+                            echo "<div class=\"mb-3\"><p>Le produit a bien été ajouté</p></div>";
+                        }
+                        else if (!$success && $updateProduct)
+                        {
+                            echo "<div class=\"mb-3\"><p>Le produit n'a pu être modifié</p></div>";
+                        }
+                        else if (!$success && $updateProduct)
+                        {
+                            echo "<div class=\"mb-3\"><p>Le produit n'a pu être ajouté</p></div>";
+                        }
+                        if ($updateProduct)
+                        {
+                            echo "<input type=\"hidden\" name=\"idProductToUpdate\" value=\"$idProduct\">";
+                        }
+                    ?>
                     <div class="mb-3"><label class="form-label" for="productName">Nom du produit</label><input class="form-control" type="text" id="productName" name="productName" value="<?php echo $product["productName"]; ?>" required></div>
                     <div class="mb-3"><label class="form-label" for="description">Description</label><textarea class="form-control" id="description" name="description" style="height: 150px;" required><?php echo $product["description"]; ?></textarea></div>
                     <div class="mb-3"><label class="form-label" for="priceInCHF">Prix en CHF</label><input class="form-control" type="number" name="priceInCHF" step="0.01" value="<?php echo $product["priceInCHF"]; ?>" required></div>
@@ -142,12 +173,9 @@
                         <div class="mb-3">
                             <div class="mb-3">
                                 <?php
-                                    if ($hasDefaultPicture)
+                                    foreach ($othersPictures as $picture)
                                     {
-                                        foreach ($othersPictures as $picture)
-                                        {
-                                            echo "<img src=\"" . PICTURES_FOLDER . $picture["fileName"] . "\" style=\"max-width: 400px\"><div class=\"mb-3\" style=\"margin-top: 10px;\"><a href=\"addProduct.php?idPictureToDelete=" . $picture["idPicture"] . "&idProduct=" . $idProduct . "\"><button class=\"btn btn-primary\" type=\"button\"><img src=\"assets/img/icons8-poubelle.svg\"></button></a></div>";
-                                        }
+                                        echo "<img src=\"" . PICTURES_FOLDER . $picture["fileName"] . "\" style=\"max-width: 400px\"><div class=\"mb-3\" style=\"margin-top: 10px;\"><a href=\"addProduct.php?idPictureToDelete=" . $picture["idPicture"] . "&idProduct=" . $idProduct . "\"><button class=\"btn btn-primary\" type=\"button\"><img src=\"assets/img/icons8-poubelle.svg\"></button></a></div>";
                                     }
                                 ?>
                             </div>

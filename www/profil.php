@@ -69,6 +69,7 @@
                     <p>Vous pouvez modifier vos informations personnelles ici</p>
                 </div>
                 <form action="profil.php" method="post">
+                    <?php echo ($success) ? "<div class=\"mb-3\"><p>Vos informations ont bien été modifiées</p></div>" : "";?>
                     <div class="mb-3"><label class="form-label" for="newEmail">Email</label><input class="form-control item" type="email" id="newEmail" name="newEmail" value="<?php echo $profil["email"]; ?>" required></div>
                     <div class="mb-3"><p><?php echo $emailErrorMessage ?></p></div>
                     <div class="mb-3"><label class="form-label" for="password">Mot de passe</label><input class="form-control item" type="password" id="password" name="password" required></div>

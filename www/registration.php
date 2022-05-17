@@ -87,7 +87,7 @@
                             <div class="mb-3"><label class="form-label" for="email">N°</label><input class="form-control item" type="text" id="streetNumber" name="streetNumber" value="<?php echo $streetNumber; ?>" required></div>
                         </div>
                         <div class="mb-3"><label class="form-label" for="email">Code postal</label><input class="form-control item" type="text" id="postalCode" name="postalCode" value="<?php echo $postalCode; ?>" required></div>
-                        <div class="mb-3"><label class="form-label" for="email">Ville</label><input class="form-control item" type="text" id="city" name="city" required></div>
+                        <div class="mb-3"><label class="form-label" for="email">Ville</label><input class="form-control item" type="text" id="city" name="city" value="<?php echo $city; ?>" required></div>
                     </fieldset><button class="btn btn-primary" type="submit">S'inscrire</button>
                 </form>
             </div>
