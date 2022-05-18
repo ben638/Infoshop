@@ -39,12 +39,13 @@
         {
             $idProductToUpdate = filter_input(INPUT_POST, "idProductToUpdate", FILTER_SANITIZE_NUMBER_INT);
             $success = updateProductPictures($idProductToUpdate, $productName, $description, $priceInCHF, $quantity, $hasOthersPictures, $defaultPicture, $othersPictures);
-            echo "";
             header("Location: " . $dir . "addProduct.php?idProductToUpdate=$idProductToUpdate&success=$success");
             exit(0);
         }
         else {
             $success = addProductWithPictures($productName, $description, $priceInCHF, $quantity, $hasOthersPictures, $defaultPicture, $othersPictures, true);
+            unset($defaultPicture);
+            unset($othersPictures);
         }
     }
     if (isset($_GET["idPictureToDelete"]))

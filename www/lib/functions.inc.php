@@ -919,7 +919,7 @@
     }
 
     /**
-     * Function which add a product and them pictures to the database and in the server
+     * Function which add a product and its pictures to the database and in the server
      * @param $productName
      * @param $description
      * @param $priceInCHF

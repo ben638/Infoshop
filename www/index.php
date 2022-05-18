@@ -10,6 +10,16 @@
     $dir = "./";
     session_start();
     require $dir . "lib/functions.inc.php";
+    if (isset($_GET["idProductToDelete"]))
+    {
+        if (isset($_GET["deleteConfirmation"]))
+        {
+            header("Location: " . $dir . "deleteProduct.php?idProductToDelete=" . filter_input(INPUT_GET, "idProductToDelete", FILTER_SANITIZE_NUMBER_INT));
+            exit(0);
+        }
+        $showDeleteMessage = true;
+        $idProductToDelete = filter_input(INPUT_GET, "idProductToDelete", FILTER_SANITIZE_NUMBER_INT);
+    }
     if (isset($_POST["termToSearch"]))
     {
         $termToSearch = htmlspecialchars($_POST["termToSearch"]);
@@ -40,42 +50,62 @@
     <main class="page blog-post-list">
         <section class="clean-block clean-blog-list dark">
             <div class="container">
-                <div class="block-heading">
-                    <h2 class="text-info">Nos produits en vente</h2>
-                </div>
-                <form action="index.php" method="post">
-                    <input type="search" style="margin-bottom: 30px;height: 32px;width: 310px;" placeholder="Rechercher par nom ou description" name="termToSearch">
-                    <button class="btn btn-primary" type="submit" style="margin-left: 15px;margin-top: -1px;width: 50px;height: 32px;padding-top: 0px;padding-bottom: 0px;">
-                        <img src="assets/img/icons8-chercher.svg">
-                    </button>
-                </form>
-                <div class="block-content">
-                <?php
-                    if (isset($_SESSION["isAdmin"]))
-                    {
-                        echo "<a href=\"" . $dir . "addProduct.php\"><button class=\"btn btn-primary\" type=\"button\" style=\"margin-top: 10px;\"><img src=\"assets/img/icons8-plus.svg\"></button></a>";
-                    }
-                    foreach ($products as $product)
-                    {
-                        echo "<div class=\"clean-blog-post\">
-                                <div class=\"row\">
-                                    <div class=\"col-lg-5\"><a href=\"" . $dir . "productDetails.php?productId=" . $product["idProduct"] . "\"><img class=\"img-fluid d-block mx-auto\" src=\"" . PICTURES_FOLDER . $product["fileName"] . "\"></a></div>
-                                    <div class=\"col-lg-7\">
-                                        <h3><a href=\"" . $dir . "productDetails.php?productId=" . $product["idProduct"] . "\">" . $product["productName"] . "</a></h3>
-                                        <p>";
-                        for ($i = 0; $i < CHARS_NB; $i++)
+                
+                    <?php 
+                        if ($showDeleteMessage)
                         {
-                            echo $product["description"][$i];
+                            echo "<div class=\"block-heading\">
+                                    <h2 class=\"text-info\">Suppression d'un produit</h2>
+                                </div>
+                                <div class=\"block-content\">
+                                    <div class=\"clean-blog-post\">
+                                        <div class=\"row\">
+                                            <div class=\"col-lg-5\"><span>Voulez-vous vraiment supprimer ce produit ?</span></div>
+                                            <div class=\"col-lg-7\">
+                                                <a href=\"" . $dir . "index.php?idProductToDelete=$idProductToDelete&deleteConfirmation=true\"><button class=\"btn btn-primary\" type=\"button\" style=\"margin-top: 10px;\">Oui</button></a>
+                                                <a href=\"" . $dir . "index.php\"><button class=\"btn btn-primary\" type=\"button\" style=\"margin-top: 10px;\">Non</button></a>
+                                            </div>
+                                        </div>
+                                    </div>";
+                            $_GET["idProductToDelete"] = filter_input(INPUT_GET, "idProductToDelete", FILTER_SANITIZE_NUMBER_INT);
                         }
-                        echo "...</p><p>" . $product["priceInCHF"] . " CHF</p>";
-                        if (isset($_SESSION["isAdmin"]))
-                        {
-                            echo "<a href=\"" . $dir . "addProduct.php?idProductToUpdate=" . $product["idProduct"] . "\"><button class=\"btn btn-primary\" type=\"button\" style=\"margin-top: 10px;\"><img src=\"assets/img/icons8-modifier.svg\"></button></a>";
-                            echo "<a href=\"" . $dir . "deleteProduct.php?idProductToDelete=" . $product["idProduct"] . "\"><button class=\"btn btn-primary\" type=\"button\" style=\"margin-top: 10px;\"><img src=\"assets/img/icons8-poubelle.svg\"></button></a>";
+                        else {
+                            echo "<div class=\"block-heading\">
+                                    <h2 class=\"text-info\">Nos produits en vente</h2>
+                                </div>
+                                <form action=\"index.php\" method=\"post\">
+                                    <input type=\"search\" style=\"margin-bottom: 30px;height: 32px;width: 310px;\" placeholder=\"Rechercher par nom ou description\" name=\"termToSearch\">
+                                    <button class=\"btn btn-primary\" type=\"submit\" style=\"margin-left: 15px;margin-top: -1px;width: 50px;height: 32px;padding-top: 0px;padding-bottom: 0px;\">
+                                        <img src=\"assets/img/icons8-chercher.svg\">
+                                    </button>
+                                </form>
+                                <div class=\"block-content\">";
+                            if (isset($_SESSION["isAdmin"]))
+                            {
+                                echo "<a href=\"" . $dir . "addProduct.php\"><button class=\"btn btn-primary\" type=\"button\" style=\"margin-top: 10px;\"><img src=\"assets/img/icons8-plus.svg\"></button></a>";
+                            }
+                            foreach ($products as $product)
+                            {
+                                echo "<div class=\"clean-blog-post\">
+                                        <div class=\"row\">
+                                            <div class=\"col-lg-5\"><a href=\"" . $dir . "productDetails.php?productId=" . $product["idProduct"] . "\"><img class=\"img-fluid d-block mx-auto\" src=\"" . PICTURES_FOLDER . $product["fileName"] . "\"></a></div>
+                                            <div class=\"col-lg-7\">
+                                                <h3><a href=\"" . $dir . "productDetails.php?productId=" . $product["idProduct"] . "\">" . $product["productName"] . "</a></h3>
+                                                <p>";
+                                for ($i = 0; $i < CHARS_NB; $i++)
+                                {
+                                    echo $product["description"][$i];
+                                }
+                                echo "...</p><p>" . $product["priceInCHF"] . " CHF</p>";
+                                if (isset($_SESSION["isAdmin"]))
+                                {
+                                    echo "<a href=\"" . $dir . "addProduct.php?idProductToUpdate=" . $product["idProduct"] . "\"><button class=\"btn btn-primary\" type=\"button\" style=\"margin-top: 10px;\"><img src=\"assets/img/icons8-modifier.svg\"></button></a>";
+                                    echo "<a href=\"" . $dir . "index.php?idProductToDelete=" . $product["idProduct"] . "\"><button class=\"btn btn-primary\" type=\"button\" style=\"margin-top: 10px;\"><img src=\"assets/img/icons8-poubelle.svg\"></button></a>";
+                                }
+                                echo "</div></div></div>";
+                            }
                         }
-                        echo "</div></div></div>";
-                    }
-                ?>
+                    ?>
                 </div>
             </div>
         </section>
