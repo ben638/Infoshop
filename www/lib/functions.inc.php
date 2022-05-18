@@ -1171,6 +1171,16 @@
         return true;
     }
 
+    /**
+     * Function which update the informations of a product
+     * @param $idProduct
+     * @param $productName
+     * @param $description
+     * @param $priceInCHF
+     * @param $remainingNumber
+     * @return bool|array
+     * 
+     */
     function updateProductInfos($idProduct, $productName, $description, $priceInCHF, $remainingNumber)
     {
         $answer = false;
@@ -1236,6 +1246,13 @@
         return $answer[0];
     }
 
+    /**
+     * Function which change the state of the payement
+     * @param $idOrder
+     * @param $isPaid
+     * @return bool
+     * 
+     */
     function switchPaid($idOrder, $isPaid)
     {
         $answer = false;
@@ -1256,6 +1273,13 @@
         return $answer;
     }
 
+    /**
+     * Function which change the state of the sending
+     * @param $idOrder
+     * @param $isPaid
+     * @return bool
+     * 
+     */
     function switchSent($idOrder, $isSent)
     {
         $answer = false;
@@ -1276,6 +1300,14 @@
         return $answer;
     }
 
+    /**
+     * Function which delete a product from the shoppingBasket
+     * @param $idProduct
+     * @param $quantity
+     * @param $idOrder
+     * @return bool
+     * 
+     */
     function deleteProductFromShoppingBasket($idProduct, $quantity, $idOrder)
     {
         static $ps = null;
@@ -1296,6 +1328,15 @@
         return $answer;
     }
 
+    
+    /**
+     * Function which update a product from the shoppingBasket
+     * @param $idProduct
+     * @param $quantity
+     * @param $idOrder
+     * @return bool
+     * 
+     */
     function updateProductInShoppingBasket($idProduct, $quantity, $idOrder)
     {
         static $ps = null;
@@ -1316,27 +1357,4 @@
         }
         return $answer;
     }
-
-
-    /*function getIdsPictures($idProduct)
-    {
-        static $ps = null;
-        $sql = "SELECT idPicture FROM PICTURE_PRODUCT WHERE idProduct = :ID_PRODUCT;";
-        if ($ps == null) 
-        {
-            $ps = dbConnect()->prepare($sql);
-        }
-        $answer = false;
-        try {
-            $ps->bindParam(':ID_PRODUCT', $idProduct, PDO::PARAM_INT);
-            if ($ps->execute())
-            {
-                $answer = $ps->fetchAll(PDO::FETCH_ASSOC);
-            }
-        } 
-        catch (PDOException $e) {
-            echo $e->getMessage();
-        }
-        return $answer;
-    }*/
 ?>

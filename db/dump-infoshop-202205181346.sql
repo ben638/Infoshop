@@ -16,13 +16,13 @@
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
 --
--- Table structure for table `ORDER`
+-- Table structure for table `ORDERED`
 --
 
-DROP TABLE IF EXISTS `ORDER`;
+DROP TABLE IF EXISTS `ORDERED`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
-CREATE TABLE `ORDER` (
+CREATE TABLE `ORDERED` (
   `idOrder` int(11) NOT NULL AUTO_INCREMENT,
   `isPaid` tinyint(1) NOT NULL,
   `isSent` tinyint(1) NOT NULL,
@@ -31,16 +31,16 @@ CREATE TABLE `ORDER` (
   PRIMARY KEY (`idOrder`),
   KEY `ORDER_FK` (`email`),
   CONSTRAINT `ORDER_FK` FOREIGN KEY (`email`) REFERENCES `USER` (`email`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=20 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Dumping data for table `ORDER`
+-- Dumping data for table `ORDERED`
 --
 
-LOCK TABLES `ORDER` WRITE;
-/*!40000 ALTER TABLE `ORDER` DISABLE KEYS */;
-/*!40000 ALTER TABLE `ORDER` ENABLE KEYS */;
+LOCK TABLES `ORDERED` WRITE;
+/*!40000 ALTER TABLE `ORDERED` DISABLE KEYS */;
+/*!40000 ALTER TABLE `ORDERED` ENABLE KEYS */;
 UNLOCK TABLES;
 
 --
@@ -54,7 +54,7 @@ CREATE TABLE `PICTURE` (
   `idPicture` int(11) NOT NULL AUTO_INCREMENT,
   `fileName` varchar(1000) NOT NULL,
   PRIMARY KEY (`idPicture`)
-) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=242 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -79,8 +79,8 @@ CREATE TABLE `PICTURE_PRODUCT` (
   `isDefaultPicture` tinyint(1) NOT NULL DEFAULT 0,
   PRIMARY KEY (`idProduct`,`idPicture`),
   KEY `PICTURE_PRODUCT_FK` (`idPicture`),
-  CONSTRAINT `PICTURE_PRODUCT_FK` FOREIGN KEY (`idPicture`) REFERENCES `PICTURE` (`idPicture`),
-  CONSTRAINT `PICTURE_PRODUCT_FK_1` FOREIGN KEY (`idProduct`) REFERENCES `PRODUCT` (`idProduct`)
+  CONSTRAINT `PICTURE_PRODUCT_FK` FOREIGN KEY (`idPicture`) REFERENCES `PICTURE` (`idPicture`) ON DELETE CASCADE,
+  CONSTRAINT `PICTURE_PRODUCT_FK_1` FOREIGN KEY (`idProduct`) REFERENCES `PRODUCT` (`idProduct`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -106,8 +106,9 @@ CREATE TABLE `PRODUCT` (
   `description` varchar(1000) NOT NULL,
   `priceInCHF` double NOT NULL,
   `remainingNumber` int(11) NOT NULL,
-  PRIMARY KEY (`idProduct`)
-) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8;
+  PRIMARY KEY (`idProduct`),
+  UNIQUE KEY `PRODUCT_UN` (`productName`)
+) ENGINE=InnoDB AUTO_INCREMENT=102 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -132,8 +133,8 @@ CREATE TABLE `PRODUCT_ORDERED` (
   `quantity` int(11) NOT NULL,
   PRIMARY KEY (`idProduct`,`idOrder`),
   KEY `PRODUCT_ORDERED_FK_1` (`idOrder`),
-  CONSTRAINT `PRODUCT_ORDERED_FK` FOREIGN KEY (`idProduct`) REFERENCES `PRODUCT` (`idProduct`),
-  CONSTRAINT `PRODUCT_ORDERED_FK_1` FOREIGN KEY (`idOrder`) REFERENCES `ORDER` (`idOrder`)
+  CONSTRAINT `PRODUCT_ORDERED_FK` FOREIGN KEY (`idProduct`) REFERENCES `PRODUCT` (`idProduct`) ON DELETE CASCADE,
+  CONSTRAINT `PRODUCT_ORDERED_FK_1` FOREIGN KEY (`idOrder`) REFERENCES `ORDERED` (`idOrder`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -188,4 +189,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2022-05-04  9:19:31
+-- Dump completed on 2022-05-18 13:46:23
